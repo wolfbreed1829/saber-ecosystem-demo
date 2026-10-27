@@ -1,4 +1,4 @@
-# Saber Tech — The Big One
+# Saber Tech — True innovation starts with connectivity
 
 A cinematic digital blueprint of the Saber Tech ecosystem and the everyday life it supports, implemented in **Rust / Leptos 0.8 client-side rendering** and compiled to WebAssembly with Trunk.
 

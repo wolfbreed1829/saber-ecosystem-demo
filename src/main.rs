@@ -65,7 +65,7 @@ fn App() -> impl IntoView {
                 "connections" => "What supports family life",
                 "interest" => "Early investment interest",
                 "interest/thanks" => "Thank you for your interest",
-                _ => "The Big One",
+                _ => "True innovation starts with connectivity",
             }
             .to_string()
         };
@@ -88,7 +88,7 @@ fn App() -> impl IntoView {
                     }
                 }}
             </main>
-            <footer class="global-footer"><span><i class="status-dot"/>"SABER TECH / THE BIG ONE"</span><span>"TARGET ARCHITECTURE · DIGITAL BLUEPRINT"</span><span class="footer-right">"DESIGNED AS ONE. ACCOUNTABLE BY DOMAIN."</span></footer>
+            <footer class="global-footer"><span><i class="status-dot"/>"SABER TECH / TRUE INNOVATION STARTS WITH CONNECTIVITY"</span><span>"TARGET ARCHITECTURE · DIGITAL BLUEPRINT"</span><span class="footer-right">"DESIGNED AS ONE. ACCOUNTABLE BY DOMAIN."</span></footer>
         </div>
     }
 }
