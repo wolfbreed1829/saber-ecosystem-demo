@@ -332,18 +332,6 @@ pub fn Roadmap() -> impl IntoView {
 }
 
 #[component]
-pub fn Landing() -> impl IntoView {
-    view! {
-        <section class="landing-scene" aria-label="Saber Tech executive entrance">
-            <div class="hero-art"><img src="public/tiger-earth.png" alt="A fierce electric-blue tiger emerging from a luminous planet Earth"/><div class="orbital orbital-one"/><div class="orbital orbital-two"/></div><div class="hero-grid"/>
-            <div class="hero-copy"><p class="eyebrow"><span/>"THE BIG ONE / AN INTEGRATED WORLD"</p><h1>"EVERYTHING."<br/><em>"CONNECTED."</em><br/>"BY DESIGN."</h1><p class="hero-description">"An entire ecosystem. From the places we live to the systems that sustain us. Explore the architecture of a self-reliant Saber Tech world."</p><a class="primary-button enter-button" href="#/atlas"><span>"ENTER THE ECOSYSTEM"</span><Arrow/></a><div class="entrance-hint"><span>"01—12"</span>"EXPLORE A COMPLETE WORLD"</div></div>
-            <div class="hero-coordinate"><span>"SABER / EARTH SYSTEMS"</span><b>"ONE VISION."<br/>"EVERY ESSENTIAL."</b><i/></div>
-            <div class="hero-metrics"><div><b>"24"</b><span>"OPERATING DOMAINS"</span></div><div><b>"12"</b><span>"LAYERS OF EXPLORATION"</span></div><div><b>"01"</b><span>"CONNECTED ECOSYSTEM"</span></div><p>"From everyday services"<br/>"to the ability to produce"<br/>"what keeps them running."</p></div>
-        </section>
-    }
-}
-
-#[component]
 pub fn Systems() -> impl IntoView {
     let filter = RwSignal::new("All domains");
     let search = RwSignal::new(String::new());

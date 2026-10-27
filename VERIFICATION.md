@@ -1,5 +1,15 @@
 # Verification
 
+Entrance and early-interest update, 2026-10-27:
+
+- Release compilation passes with the signup and entrance components implemented in Leptos. The form has no custom email server or exposed secret.
+- Browser validation blocks empty required fields, invalid email, and an unchecked consent box. Moving back from review retains the entered values. A script-shaped note remains text.
+- A browser-intercepted native POST confirmed the exact FormSubmit recipient URL, all entered fields, consent acknowledgment, subject, blank honeypot, and absolute thank-you URL. That test was intercepted and sent no email.
+- A separate real, clearly labeled setup request reached FormSubmit from the published site's origin and triggered activation. The inbox owner confirmed activation; a subsequent labeled delivery test returned HTTP 200 and `success: "true"`. Provider acceptance is verified. The destination inbox and native provider CAPTCHA/redirect flow were not independently verified end to end.
+- Desktop and mobile entrance/signup layouts were inspected at 1440×900, 1366×768, and 390×844 without document horizontal overflow. On desktop, the form uses separate contact and review steps. Mobile panels stack.
+- Pointer movement changes the scene's parallax parameters. The pause button and operating-system reduced-motion preference stop the image, orbit, particles, energy, and headline animations. The signup and ecosystem-entry links navigate correctly.
+- A `pageshow` listener restores the submit button after returning from the provider, and is removed when the form component unmounts.
+
 Family-life and connected-atlas release, 2026-10-27.
 
 - The Leptos client compiles for `wasm32-unknown-unknown` with `trunk build --release --public-url ./`. Rust formatting and Git whitespace checks pass.

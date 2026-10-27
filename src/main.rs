@@ -2,6 +2,8 @@ mod atlas;
 mod community;
 mod community_data;
 mod data;
+mod entrance;
+mod interest;
 mod pages;
 mod readiness;
 mod ui;
@@ -61,6 +63,8 @@ fn App() -> impl IntoView {
                 "day" => "A household journey",
                 "places" => "Everyday places",
                 "connections" => "What supports family life",
+                "interest" => "Early investment interest",
+                "interest/thanks" => "Thank you for your interest",
                 _ => "The Big One",
             }
             .to_string()
@@ -75,7 +79,8 @@ fn App() -> impl IntoView {
                 {move || {
                     let r=route.get();
                     match r.as_str() {
-                        "" => pages::Landing().into_any(), "atlas" => atlas::Atlas().into_any(), "systems" => pages::Systems().into_any(), "flows" => pages::Flows().into_any(), "architecture" => pages::Architecture().into_any(), "governance" => pages::Governance().into_any(), "roadmap" => pages::Roadmap().into_any(),
+                        "" => view!{<entrance::Entrance reduced=reduced/>}.into_any(), "atlas" => atlas::Atlas().into_any(), "systems" => pages::Systems().into_any(), "flows" => pages::Flows().into_any(), "architecture" => pages::Architecture().into_any(), "governance" => pages::Governance().into_any(), "roadmap" => pages::Roadmap().into_any(),
+                        "interest" => interest::Interest().into_any(), "interest/thanks" => interest::InterestThanks().into_any(),
                         "community" => community::Community().into_any(), "learning" => view!{<community::Campus play=false/>}.into_any(), "play" => view!{<community::Campus play=true/>}.into_any(), "day" => community::Day().into_any(), "places" => community::Places().into_any(), "connections" => community::Connections().into_any(),
                         _ if r.starts_with("place/") => view! { <community::PlacePage id=r[6..].to_string()/> }.into_any(),
                         _ if r.starts_with("domain/") => view! { <pages::DomainPage id=r[7..].to_string()/> }.into_any(),

@@ -20,6 +20,7 @@ pub fn Header(route: RwSignal<String>, reduced: RwSignal<bool>) -> impl IntoView
         ("architecture", "Architecture"),
         ("governance", "Governance"),
         ("roadmap", "Roadmap"),
+        ("interest", "Early interest"),
     ];
     view! {
         <header class="global-header"><Logo/>

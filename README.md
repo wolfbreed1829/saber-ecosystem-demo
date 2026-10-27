@@ -4,7 +4,7 @@ A cinematic digital blueprint of the Saber Tech ecosystem and the everyday life 
 
 ## Experience
 
-- Blue tiger and Earth entrance.
+- Animated blue tiger and Earth entrance with pointer-driven depth, orbiting lights, drifting particles, light passes, and solid cyan-to-blue headline lettering. All motion respects the pause control and reduced-motion preference.
 - Interactive isometric atlas with eleven district entries, including Nexus education and civic participation. Select a district to reveal labeled, navigable connections across physical supply, digital coordination, and decision authority.
 - A family neighborhood, a nine-space learning campus, and a six-zone discovery park, each with original vector illustrations and selectable places.
 - Twenty everyday-place blueprints covering homes, school, childcare, playgrounds, library, sports, swimming, arts, teen spaces, elder support, family care, daily essentials, accessibility, transport, and more.
@@ -14,6 +14,7 @@ A cinematic digital blueprint of the Saber Tech ecosystem and the everyday life 
 - Five physical production chains with individually selectable stages.
 - Six architecture layers, four authority perspectives, and six evidence stages.
 - A proposed first deployment: a complete housing-maintenance request workflow, with users, operator responsibilities, dependencies, and proposed acceptance criteria. It is a planning proposal, not an announced launch.
+- A two-step early investment-interest form at `#/interest`, with contact details, topic selection, optional notes, a review step, and explicit consent. It sends a native HTTPS POST to FormSubmit for delivery to `development@sabertechlogistics.com`.
 - Search, sector filters, pagination, hash-based deep links, copy-link sharing, reduced motion, keyboard-accessible controls, and responsive layouts.
 
 The visual atlas is a conceptual arrangement, not a selected development site or engineering plan. The content describes proposed capabilities and preserves explicit evidence boundaries. The private blueprint repository and source PDFs are not included.
@@ -35,7 +36,7 @@ If an inherited `NO_COLOR=1` makes Trunk reject its boolean setting, set `NO_COL
 trunk build --release --public-url ./
 ```
 
-The output is `dist/`. Hash navigation keeps every section directly shareable on GitHub Pages without a server-side router. The application has no backend or credentials and makes no application-data requests to external services.
+The output is `dist/`. Hash navigation keeps every section directly shareable on GitHub Pages without a server-side router. The application has no database, backend credentials, or payment integration. The interest form sends the visitor's entered details to the explicitly disclosed FormSubmit service only when they submit it. FormSubmit handles delivery and its spam check; GitHub Pages itself cannot send email.
 
 The checked-in `docs/` directory is the verified release bundle used by GitHub Pages (main branch, `/docs`). Rebuild and refresh that directory when publishing an update. See [verification](VERIFICATION.md).
 
@@ -44,6 +45,16 @@ The checked-in `docs/` directory is the verified release bundle used by GitHub P
 Run `python generate_atlas.py`, `python generate_community.py`, and `python generate_atlas_extensions.py` to regenerate the original vector illustrations. These are conceptual arrangements, not dimensioned construction or playground equipment designs.
 
 Twelve main routes are directly shareable through hash navigation, plus 24 domain and 20 place routes. Start with `#/community` for family life, `#/learning` for the campus, `#/play` for the park, or `#/day` for a guided household journey.
+
+## Early investment-interest delivery
+
+- `src/interest.rs` contains the public recipient and thank-you URL constants, the two-step form, and the nonbinding-interest acknowledgment. `src/entrance.rs` contains the entrance scene and its signup link.
+- The native form action is `https://formsubmit.co/development@sabertechlogistics.com`. Default FormSubmit reCAPTCHA remains enabled, and an additional `_honey` field is included. The visitor's `email` field supplies the reply-to address through FormSubmit's documented behavior. A review must be completed and contact consent checked before POST.
+- On 2026-10-27, a clearly labeled technical setup request triggered FormSubmit's activation email. The inbox owner confirmed activation. A subsequent, clearly labeled delivery test from the public site's browser origin to the documented AJAX endpoint returned HTTP 200 with `success: "true"` and `The form was submitted successfully.` This verifies provider acceptance after activation; the recipient inbox was not independently inspected.
+- For ongoing end-to-end delivery checks, submit a clearly identified test through the published form, complete any provider spam check, confirm receipt in the recipient inbox, and confirm the return to `#/interest/thanks`. Provider acceptance alone does not prove inbox delivery.
+- The app does not collect investment amounts, payment details, identity documents, or binding commitments. It does not upload the user's unpublished planning documents. The notice describes an undecided potential offering and nonbinding interest; the actual issuer, exemption, offering materials, and any registered intermediary need to be established for an actual offering.
+- Form handling and activation follow the [FormSubmit documentation](https://formsubmit.co/documentation) and [setup instructions](https://formsubmit.co/). The public form links to the [provider's privacy terms](https://formsubmit.co/privacy.pdf) and gives the development address for withdrawal/removal requests.
+- The notice was informed by [17 CFR 230.241](https://www.ecfr.gov/current/title-17/chapter-II/part-230/section-230.241) and the [SEC's issuer guidance](https://www.sec.gov/resources-small-businesses/small-business-compliance-guides/regulation-crowdfunding-guidance-issuers). Its inclusion is not a legal determination of eligibility or compliance; the final offering setup should be reviewed by qualified securities counsel.
 
 ## Assets
 
