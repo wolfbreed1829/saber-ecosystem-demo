@@ -191,6 +191,13 @@ fn parse(raw: &Raw) -> Result<Inputs, Vec<FieldError>> {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HouseholdAnnual {
+    pub other: Ratio,
+    pub school: Ratio,
+    pub support: u128,
+    pub total: Ratio,
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Results {
     pub input: Inputs,
     pub other_annual: u128,
@@ -204,6 +211,8 @@ pub struct Results {
     pub household_other: Ratio,
     pub household_school: Ratio,
     pub household_total: Ratio,
+    pub household_per_resident: Ratio,
+    pub household_annual: HouseholdAnnual,
 }
 fn calculate(i: Inputs) -> Option<Results> {
     let other_annual = i.b.checked_sub(i.s)?;
@@ -227,6 +236,15 @@ fn calculate(i: Inputs) -> Option<Results> {
     let household_total = household_other
         .plus(household_school)?
         .plus(Ratio::new(i.g, 1))?;
+    let household_per_resident =
+        Ratio::new(household_total.num, household_total.den.checked_mul(i.h)?);
+    // Annualize exact rates, never the rounded monthly display strings.
+    let household_annual = HouseholdAnnual {
+        other: household_other.times(12)?,
+        school: household_school.times(12)?,
+        support: i.g.checked_mul(12)?,
+        total: household_total.times(12)?,
+    };
     Some(Results {
         input: i,
         other_annual,
@@ -240,6 +258,8 @@ fn calculate(i: Inputs) -> Option<Results> {
         household_other,
         household_school,
         household_total,
+        household_per_resident,
+        household_annual,
     })
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -342,6 +362,41 @@ mod tests {
         assert_eq!(r.support, 60000);
         assert_eq!(r.remaining, 999_940_000);
         assert_eq!(r.household_total.usd(), "$2,216.62");
+        assert_eq!(r.household_annual.support, 60_000);
+        assert_eq!(r.household_annual.school.usd(), "$9,999.40");
+        assert_eq!(r.household_annual.total.usd(), "$26,599.40");
+    }
+    #[test]
+    fn annual_household_share_updates_with_children_without_changing_community_budget() {
+        for (children, school, total, average) in [
+            ("0", "$0.00", "$16,000.00", "$333.33"),
+            ("1", "$5,000.00", "$21,000.00", "$437.50"),
+            ("2", "$10,000.00", "$26,000.00", "$541.67"),
+        ] {
+            let r = result(&[(5, "4"), (6, children)]);
+            assert_eq!(r.household_annual.other.usd(), "$16,000.00");
+            assert_eq!(r.household_annual.school.usd(), school);
+            assert_eq!(r.household_annual.total.usd(), total);
+            assert_eq!(r.household_per_resident.usd(), average);
+            assert_eq!(r.input.b, 5_000_000_000);
+            assert_eq!(r.remaining, 1_000_000_000);
+            assert_eq!(r.input.e, 2_000);
+        }
+    }
+    #[test]
+    fn annual_values_follow_support_and_enrollment_at_full_precision() {
+        let r = result(&[(5, "4"), (6, "2"), (4, "2000000")]);
+        assert_eq!(r.household_annual.school.usd(), "$8,000.00");
+        assert_eq!(r.household_annual.total.usd(), "$24,000.00");
+        let r = result(&[(5, "4"), (6, "2"), (3, "1000")]);
+        assert_eq!(r.household_annual.school.usd(), "$20,000.00");
+        assert_eq!(r.household_annual.total.usd(), "$36,000.00");
+        let r = result(&[(3, "0"), (7, "50")]);
+        assert_eq!(r.household_annual.school.usd(), "$0.00");
+        assert_eq!(r.household_annual.total.usd(), "$8,600.00");
+        let r = result(&[(5, "4"), (6, "2"), (4, "11000000")]);
+        assert_eq!(r.household_annual.school.usd(), "$0.00");
+        assert_eq!(r.household_annual.total.usd(), "$16,000.00");
     }
     #[test]
     fn zero_enrollment_preserves_need_and_unavailable_rate() {

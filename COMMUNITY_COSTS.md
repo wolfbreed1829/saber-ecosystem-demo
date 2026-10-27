@@ -22,6 +22,7 @@ All money inputs are USD. Defaults are total budget B=$50m, school S=$10m, resid
 - Support applied = min(S, support). Excess remains an unallocated surplus; it never lowers other-service charges.
 - Remaining school requirement = max(0, S − support). With enrollment E > 0, divide this by 12 × E for the required monthly student rate. With E = 0, the rate is unavailable and the remaining need stays visible.
 - Household total = H × other rate + K × school rate + G; the school term is zero when K = 0.
+- The household's displayed monthly per-resident average is its exact household total divided by H. Its annual breakdown multiplies each exact monthly component by 12 before rounding. Household enrollment updates these household figures; it does not change the independent communitywide enrollment assumption or operating budget.
 - The optional comparison uses entered price F: annual student charges = 12 × E × F. Add assumed support to show the gap or surplus against S. Its separate household total uses K × F. It never replaces the primary required rate.
 - Annual other-service requirements + school participant requirements + applied support reconcile to B. At zero enrollment, the unfilled school requirement replaces participant charges. Surplus is additional and separate.
 
@@ -33,11 +34,13 @@ Inputs are parsed into integer cents with at most two decimal places; no floatin
 
 Require N > 0; 0 ≤ S ≤ B; 0 ≤ E ≤ N; 1 ≤ H ≤ N; 0 ≤ K ≤ H and K ≤ E; E − K ≤ N − H. These rules prevent counting more students outside the household than residents outside it. Negative, empty required, malformed, excessive-precision, and out-of-range values remain in their fields with explanations. Invalid base inputs remove the primary estimate. An invalid comparison price only disables the comparison. A blank comparison is inactive and differs from explicitly testing $0.
 
-Displayed rounded lines can differ from their total by a cent. For four residents and two students, household other services are displayed as $1,333.33 and school as $833.33; the exact total rounds to $2,166.67. With a $50 monthly household gift, its $600 annual support reduces the shared school rate and the household total becomes $2,216.62.
+Displayed rounded lines can differ from their total by a cent. For four residents and two students, household other services are displayed as $1,333.33 and school as $833.33; the exact total rounds to $2,166.67. The annual total is $26,000.00, computed before monthly display rounding. With a $50 monthly household gift, its $600 annual support reduces the shared school rate and the household total becomes $2,216.62 monthly or $26,599.40 annually.
 
 ## Interface and evidence
 
 `#/costs` has three focused views: How it works, Household calculator, and Funding & accountability. Each has an intentional desktop scroll region; mobile stacks content in reading order. Native details controls expose community assumptions, reconciliation, and the alternative-price comparison. Labels link help and errors to fields. Results update without moving focus; a polite summary is announced when an edit is committed rather than on every keystroke. Reset restores all input defaults and clears errors. Screen-reader audio output has not been independently audited.
+
+The results show an expanded household annual breakdown with enrolled-child count, other services, required school contribution, optional support, and total. The whole-community reconciliation and its pre-allocation average sit in a separately labeled expandable section. The visitor's expanded/collapsed choices persist through edits and invalid-input recovery, so the breakdown can be watched while changing enrollment.
 
 The feature creates no bill, enrollment, coverage, pledge, investment, voting action, or payment. Values exist only in component memory, and are not transmitted, persisted, or placed in a shared URL. Development donations and investment-interest inquiries are separate from hypothetical school support. Optional support creates no extra community voting rights.
 

@@ -55,6 +55,8 @@ The founder's planning example allocates $10 million to school and $11 million t
 
 The calculator assumes 2,000 resident students, universal participation in non-school operations, and school allocation per enrolled student. Optional support starts at zero. No enrolled household students means no required school charge in this example; final eligibility and treatment of schooling elsewhere remain open. General support reduces the requirement shared by all enrolled students; targeted hardship support is not modeled.
 
+Changing the household's enrolled-child count updates its monthly total, per-resident household average, and annual school breakdown immediately. The household annual view stays expanded while editing; the whole-community budget remains separately labeled. Annual values use exact rates before monthly rounding.
+
 `src/cost_model.rs` holds the defaults, strict decimal-to-cents parsing, cross-field validation, exact rational calculations, half-up display rounding, and focused tests. `src/community_costs.rs` implements the explanation and UI; `community-costs.css` supplies scoped presentation styles. The overview always presents the founder's original scenario, while calculator edits apply to its own results. See [model notes and unresolved decisions](COMMUNITY_COSTS.md).
 
 Run the pure model tests without a browser or WebAssembly test runner:

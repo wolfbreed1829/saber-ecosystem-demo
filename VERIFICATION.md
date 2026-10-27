@@ -1,5 +1,13 @@
 # Verification
 
+Household enrollment breakdown update, 2026-10-27:
+
+- All 12 pure-model tests pass. The annual household breakdown uses exact rates before rounding and the monthly household average divides the exact total by household residents. Tests cover changing household enrollment, support, zero enrollment, and surplus while preserving the independent community budget and student assumptions.
+- Chromium checks for a four-person household confirm 0 / 1 / 2 enrolled children update the annual school share to $0 / $5,000 / $10,000, annual totals to $16,000 / $21,000 / $26,000, and monthly household per-resident averages to $333.33 / $437.50 / $541.67. The community budget remains $50 million.
+- The two-student household with $50 monthly support displays $26,599.40 annually, using exact amounts rather than multiplying the rounded monthly display. Reset returns the default $8,000 annual household estimate.
+- Household and community disclosure states persist through rapid edits and invalid-input recovery. Enter and Space operate the native summary controls. Invalid counts hide results, and valid corrections restore the updated breakdown.
+- Desktop and mobile screenshots were reviewed; the annual breakdown remains reachable without horizontal overflow at 1440×900, 1280×640, and 360×800. Rust formatting and the production build pass; no application console errors were observed.
+
 Community costs and choice, 2026-10-27:
 
 - Ten native pure-model tests pass (`rustc --edition 2024 --test src/cost_model.rs`). They cover the written reference examples A–I, own-household support accounting, zero enrollment and budgets, surplus, strict parsing and count compatibility, supported numeric limits, exact half-up rounding, inactive versus zero-price comparison, and 920 exact annual reconciliation scenarios. The referenced companion JSON files were unavailable; these tests derive from the written contract.
