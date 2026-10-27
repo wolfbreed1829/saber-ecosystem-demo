@@ -1,5 +1,18 @@
 # Verification
 
+Family-based upkeep and recovery campus, 2026-10-27:
+
+- All 13 native pure-model tests pass, including 2,600 exact annual reconciliation scenarios. The revised default is $150 million across 10,000 families: a $1,250 monthly whole-budget equal-share baseline. The retained $10 million school assumption leaves a $140 million non-school pool, charged once per family regardless of member count.
+- Chromium checks confirm that changing family size from two to four members leaves the non-school share at $1,166.67 monthly. For a four-member family, 0 / 1 / 2 enrolled children produce monthly estimates of $1,166.67 / $1,583.33 / $2,000 and annual totals of $14,000 / $19,000 / $24,000. School enrollment remains an independent 2,000-student illustration.
+- School support of $2 million gives a two-student family a $1,833.33 monthly estimate. Its own $50 monthly optional support produces an exact annual total of $24,599.40. A $300 alternative school price exposes the $2.8 million gap. Reset restores the revised defaults. Counts distinguish families from people; a two-family/five-student scenario is valid, while a one-family scenario requires matching household and community enrollment.
+- Browser instrumentation recorded zero calculator network requests and no application page errors in the tested edits and route changes. A focused field's change handler now tolerates route disposal; leaving an edited field for the recovery page no longer accesses disposed reactive state.
+- All three recovery facilities, seven material loops, and three page views were exercised. Each loop updates its input/process/output diagram, explanation, domain links, and source. The 12-marker atlas exposes Recovery works with 4 physical, 3 digital, and 3 authority links. Atlas and domain links reach the new page; browser back/forward and keyboard activation of its view buttons work.
+- Recovery and costs views were checked at 1440x900, 1280x640, 768x1024, and 360x800 without horizontal document overflow. Desktop and mobile screenshots were reviewed. Longer material details and source links remain reachable; desktop content scrolls within its frame and mobile content stacks.
+- The production Trunk/WebAssembly build passes. Both new/updated SVG illustrations parse; the directory retains 24 domains and 20 community places. No new dependencies or services were added, and no payment or email was sent during this update.
+- Technical references are listed in `RECOVERY.md` and linked from the page. They support general material pathways, not Saber operating readiness, recoverable volumes, individual facility budgets, or recycling revenue. The $10 million school and $11 million hospital allocations are retained assumptions; the $129 million remainder includes the new operations without invented prices.
+
+Earlier release records below retain the assumptions and results that applied at the time; their $50 million resident-based examples are superseded by the family-based model above.
+
 Household enrollment breakdown update, 2026-10-27:
 
 - All 12 pure-model tests pass. The annual household breakdown uses exact rates before rounding and the monthly household average divides the exact total by household residents. Tests cover changing household enrollment, support, zero enrollment, and surplus while preserving the independent community budget and student assumptions.

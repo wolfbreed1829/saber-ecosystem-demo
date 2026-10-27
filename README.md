@@ -5,7 +5,7 @@ A cinematic digital blueprint of the Saber Tech ecosystem and the everyday life 
 ## Experience
 
 - Animated blue tiger and Earth entrance with pointer-driven depth, orbiting lights, drifting particles, light passes, and solid cyan-to-blue headline lettering. All motion respects the pause control and reduced-motion preference.
-- Interactive isometric atlas with eleven district entries, including Nexus education and civic participation. Select a district to reveal labeled, navigable connections across physical supply, digital coordination, and decision authority.
+- Interactive isometric atlas with twelve district entries, including recovery works, Nexus education, and civic participation. Select a district to reveal labeled, navigable connections across physical supply, digital coordination, and decision authority.
 - A family neighborhood, a nine-space learning campus, and a six-zone discovery park, each with original vector illustrations and selectable places.
 - Twenty everyday-place blueprints covering homes, school, childcare, playgrounds, library, sports, swimming, arts, teen spaces, elder support, family care, daily essentials, accessibility, transport, and more.
 - Three five-step household journeys that explain the experience, record permissions, and decision authority at each moment.
@@ -14,7 +14,8 @@ A cinematic digital blueprint of the Saber Tech ecosystem and the everyday life 
 - Five physical production chains with individually selectable stages.
 - Six architecture layers, four authority perspectives, and six evidence stages.
 - A proposed first deployment: a complete housing-maintenance request workflow, with users, operator responsibilities, dependencies, and proposed acceptance criteria. It is a planning proposal, not an announced launch.
-- A **Costs & choice** section at `#/costs`: the inclusive $50 million annual operating example for 10,000 residents, a household calculator, and funding/accountability explanations in three separate views. Housing, healthcare, utilities, school, community centers, and parks are within the proposed total. No individual prices are invented for the $29 million remainder.
+- A **Costs & choice** section at `#/costs`: the inclusive $150 million annual upkeep example shared across 10,000 families, a household calculator, and funding/accountability explanations in three separate views. Housing, healthcare, utilities, school, community centers, and parks are within the proposed total. The remainder is $129 million, including the added recovery facilities without invented individual prices.
+- A recovery campus at `#/recovery` with three selectable operations (recycling, waste management, compost/mulch), seven material pathways, source links, and readiness explanations. Open it from Costs & choice, the atlas Recovery works marker, or the recovery domain.
 - A two-step early investment-interest form at `#/interest`, with contact details, topic selection, optional notes, a review step, and explicit consent. It sends a native HTTPS POST to FormSubmit for delivery to `development@sabertechlogistics.com`.
 - Search, sector filters, pagination, hash-based deep links, copy-link sharing, reduced motion, keyboard-accessible controls, and responsive layouts.
 
@@ -45,19 +46,19 @@ The checked-in `docs/` directory is the verified release bundle used by GitHub P
 
 `src/domains.json` is the operating-domain content. `src/places.json` is the editable everyday-place content. `src/community_data.rs` defines campus and park spaces; `src/community.rs` implements the family views, journeys, and support diagrams. `src/atlas.rs` implements connection overlays; `src/readiness.rs` defines evidence status and the proposed first deployment. `style.css` preserves the established dark blue visual system.
 
-Run `python generate_atlas.py`, `python generate_community.py`, and `python generate_atlas_extensions.py` to regenerate the original vector illustrations. These are conceptual arrangements, not dimensioned construction or playground equipment designs.
+Run `python generate_atlas.py`, `python generate_community.py`, `python generate_atlas_extensions.py`, and `python generate_recovery.py` to regenerate the original vector illustrations. These are conceptual arrangements, not dimensioned construction or playground equipment designs.
 
 Main sections are directly shareable through hash navigation, plus 24 domain and 20 place routes. Start with `#/community` for family life, `#/learning` for the campus, `#/play` for the park, `#/day` for a guided household journey, or `#/costs` for the proposed operating budget and household examples.
 
 ## Community costs and choice
 
-The founder's planning example allocates $10 million to school and $11 million to hospital operations within the $50 million total; the remaining $29 million is unitemized. The hospital and remainder form the calculator's $40 million non-school pool. The average is $416.67 per resident per month before allocation by participation, not a universal household price or independently verified operating estimate.
+The founder's planning example allocates $10 million to school and $11 million to hospital operations within the revised $150 million total; the remaining $129 million is unitemized. The hospital and remainder form the calculator's $140 million non-school pool. The equal-share baseline is $15,000 per family annually, or $1,250 monthly, before allocation by school participation. These are planning inputs, not verified operating prices.
 
-The calculator assumes 2,000 resident students, universal participation in non-school operations, and school allocation per enrolled student. Optional support starts at zero. No enrolled household students means no required school charge in this example; final eligibility and treatment of schooling elsewhere remain open. General support reduces the requirement shared by all enrolled students; targeted hardship support is not modeled.
+One household represents one participating family. The calculator divides non-school upkeep by 10,000 families, never by household member count. It retains an editable illustration of 2,000 enrolled students and school allocation per student. Total resident population is unspecified; students may outnumber families. Optional support starts at zero. No enrolled household students means no required school charge in this example; final eligibility and treatment of schooling elsewhere remain open. General support reduces the requirement shared by all enrolled students; targeted hardship support is not modeled.
 
 Changing the household's enrolled-child count updates its monthly total, per-resident household average, and annual school breakdown immediately. The household annual view stays expanded while editing; the whole-community budget remains separately labeled. Annual values use exact rates before monthly rounding.
 
-`src/cost_model.rs` holds the defaults, strict decimal-to-cents parsing, cross-field validation, exact rational calculations, half-up display rounding, and focused tests. `src/community_costs.rs` implements the explanation and UI; `community-costs.css` supplies scoped presentation styles. The overview always presents the founder's original scenario, while calculator edits apply to its own results. See [model notes and unresolved decisions](COMMUNITY_COSTS.md).
+`src/cost_model.rs` holds the defaults, strict decimal-to-cents parsing, cross-field validation, exact rational calculations, half-up display rounding, and focused tests. `src/community_costs.rs` implements the explanation and UI; `community-costs.css` supplies scoped presentation styles. The overview presents the current founder-supplied planning scenario, while calculator edits apply to its own results. See [model notes and unresolved decisions](COMMUNITY_COSTS.md).
 
 Run the pure model tests without a browser or WebAssembly test runner:
 
@@ -87,6 +88,7 @@ The calculator stores values only in component memory. It sends no requests, wri
 - `public/tiger-earth.png`: generated for this project using the built-in image-generation tool. The prompt is recorded in [ARTWORK.md](ARTWORK.md).
 - `public/atlas.svg`: original code-generated vector illustration.
 - `public/atlas-extended.svg`, `public/neighborhood.svg`, `public/school-campus.svg`, and `public/playground.svg`: original code-generated vector concept models.
+- `public/recovery-campus.svg`: original code-generated campus concept; source `generate_recovery.py`. Material pathway sources and limits are recorded in [recovery notes](RECOVERY.md).
 - `public/fonts/space-grotesk.woff2`: locally hosted Space Grotesk; license in `public/fonts/OFL.txt`.
 
 The executive demo is intended for GitHub Pages publication. That does not change the local-only decision for the separate blueprint repository.

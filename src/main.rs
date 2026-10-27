@@ -8,6 +8,7 @@ mod entrance;
 mod interest;
 mod pages;
 mod readiness;
+mod recovery;
 mod ui;
 use leptos::prelude::*;
 use ui::*;
@@ -61,6 +62,7 @@ fn App() -> impl IntoView {
                 "roadmap" => "Path to independence",
                 "community" => "The family neighborhood",
                 "costs" => "Community costs & choice",
+                "recovery" => "Recycling & material recovery",
                 "learning" => "Nexus learning campus",
                 "play" => "Play & discovery park",
                 "day" => "A household journey",
@@ -85,6 +87,7 @@ fn App() -> impl IntoView {
                         "" => view!{<entrance::Entrance reduced=reduced/>}.into_any(), "atlas" => atlas::Atlas().into_any(), "systems" => pages::Systems().into_any(), "flows" => pages::Flows().into_any(), "architecture" => pages::Architecture().into_any(), "governance" => pages::Governance().into_any(), "roadmap" => pages::Roadmap().into_any(),
                         "interest" => interest::Interest().into_any(), "interest/thanks" => interest::InterestThanks().into_any(),
                         "costs" => community_costs::CommunityCosts().into_any(),
+                        "recovery" => recovery::Recovery().into_any(),
                         "community" => community::Community().into_any(), "learning" => view!{<community::Campus play=false/>}.into_any(), "play" => view!{<community::Campus play=true/>}.into_any(), "day" => community::Day().into_any(), "places" => community::Places().into_any(), "connections" => community::Connections().into_any(),
                         _ if r.starts_with("place/") => view! { <community::PlacePage id=r[6..].to_string()/> }.into_any(),
                         _ if r.starts_with("domain/") => view! { <pages::DomainPage id=r[7..].to_string()/> }.into_any(),

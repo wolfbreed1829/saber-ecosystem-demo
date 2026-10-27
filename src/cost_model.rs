@@ -6,7 +6,15 @@ pub const MAX_COUNT: u128 = 1_000_000_000;
 
 pub fn defaults() -> Raw {
     [
-        "50000000", "10000000", "10000", "2000", "0", "2", "0", "0", "",
+        "150000000",
+        "10000000",
+        "10000",
+        "2000",
+        "0",
+        "2",
+        "0",
+        "0",
+        "",
     ]
     .map(str::to_string)
 }
@@ -89,7 +97,7 @@ pub fn parse_money(raw: &str) -> Result<u128, String> {
 pub fn parse_count(raw: &str) -> Result<u128, String> {
     let raw = raw.trim();
     if raw.is_empty() || !raw.bytes().all(|b| b.is_ascii_digit()) {
-        return Err("Enter a whole number of people, without commas or signs.".into());
+        return Err("Enter a whole number, without commas or signs.".into());
     }
     raw.parse::<u128>()
         .ok()
@@ -106,7 +114,7 @@ pub struct FieldError {
 pub struct Inputs {
     pub b: u128,
     pub s: u128,
-    pub n: u128,
+    pub families: u128,
     pub e: u128,
     pub d: u128,
     pub h: u128,
@@ -130,15 +138,18 @@ fn parse(raw: &Raw) -> Result<Inputs, Vec<FieldError>> {
     if !errors.is_empty() {
         return Err(errors);
     }
-    let [b, s, n, e, d, h, k, g] = values;
+    let [b, s, families, e, d, h, k, g] = values;
     let mut error = |field, message: &str| {
         errors.push(FieldError {
             field,
             message: message.into(),
         })
     };
-    if n == 0 {
-        error(2, "The community must contain at least 1 resident.");
+    if families == 0 {
+        error(
+            2,
+            "The community must contain at least 1 participating family.",
+        );
     }
     if s > b {
         error(
@@ -146,17 +157,8 @@ fn parse(raw: &Raw) -> Result<Inputs, Vec<FieldError>> {
             "The school budget is included in the total and cannot exceed it.",
         );
     }
-    if e > n {
-        error(
-            3,
-            "Enrolled students cannot exceed community residents in this example.",
-        );
-    }
-    if h == 0 || h > n {
-        error(
-            5,
-            "Use at least 1 household resident, no more than the community total.",
-        );
+    if h == 0 {
+        error(5, "Your family must contain at least 1 household member.");
     }
     if k > h || k > e {
         error(
@@ -164,21 +166,23 @@ fn parse(raw: &Raw) -> Result<Inputs, Vec<FieldError>> {
             "Household students cannot exceed household residents or total enrollment.",
         );
     }
-    if e >= k && n >= h && e - k > n - h {
+    // Families are not people: enrollment can exceed the number of families.
+    // No total population is inferred from this household's size.
+    if families == 1 && e != k {
         error(
             3,
-            "Remaining students cannot exceed residents outside your household. Check enrollment and household counts.",
+            "With only one participating family, all enrolled students must belong to your household.",
         );
         error(
             6,
-            "Remaining students cannot exceed residents outside your household. Check enrollment and household counts.",
+            "With only one participating family, household enrollment must match community enrollment.",
         );
     }
     if errors.is_empty() {
         Ok(Inputs {
             b,
             s,
-            n,
+            families,
             e,
             d,
             h,
@@ -220,14 +224,15 @@ fn calculate(i: Inputs) -> Option<Results> {
     let applied = i.s.min(support);
     let surplus = support.saturating_sub(i.s);
     let remaining = i.s.saturating_sub(support);
-    let average = Ratio::new(i.b, i.n.checked_mul(12)?);
-    let other_rate = Ratio::new(other_annual, i.n.checked_mul(12)?);
+    let average = Ratio::new(i.b, i.families.checked_mul(12)?);
+    let other_rate = Ratio::new(other_annual, i.families.checked_mul(12)?);
     let school_rate = if i.e == 0 {
         None
     } else {
         Some(Ratio::new(remaining, i.e.checked_mul(12)?))
     };
-    let household_other = other_rate.times(i.h)?;
+    // The displayed household is one participating family, regardless of size.
+    let household_other = other_rate;
     let household_school = if i.k == 0 {
         Ratio::new(0, 1)
     } else {
@@ -330,154 +335,151 @@ mod tests {
         evaluate(&raw(edits)).result.unwrap()
     }
     #[test]
-    fn reference_examples_a_through_i() {
+    fn revised_family_budget_and_default_requirements() {
         let r = result(&[]);
-        assert_eq!(r.average.usd(), "$416.67");
-        assert_eq!(r.other_rate.usd(), "$333.33");
+        assert_eq!(r.input.b, 15_000_000_000);
+        assert_eq!(r.input.families, 10_000);
+        assert_eq!(r.average.usd(), "$1,250.00");
+        assert_eq!(r.other_annual, 14_000_000_000);
+        assert_eq!(r.other_rate.usd(), "$1,166.67");
+        assert_eq!(r.household_total.usd(), "$1,166.67");
+        assert_eq!(r.household_annual.total.usd(), "$14,000.00");
         assert_eq!(r.school_rate.unwrap().usd(), "$416.67");
-        assert_eq!(r.household_total.usd(), "$666.67");
-        assert_eq!(
-            result(&[(5, "4"), (6, "2")]).household_total.usd(),
-            "$2,166.67"
-        );
-        let r = result(&[(4, "2000000"), (5, "4"), (6, "2")]);
-        assert_eq!(r.school_rate.unwrap().usd(), "$333.33");
-        assert_eq!(r.household_total.usd(), "$2,000.00");
-        assert_eq!(result(&[(3, "1000")]).school_rate.unwrap().usd(), "$833.33");
-        let r = result(&[(7, "50")]);
-        assert_eq!(r.household_total.usd(), "$716.67");
-        assert_eq!(r.support, 60000);
-        for (support, gap) in [("0", 280_000_000), ("2000000", 80_000_000)] {
-            let c = evaluate(&raw(&[(4, support), (8, "300")]))
-                .comparison
-                .unwrap()
-                .unwrap();
-            assert_eq!(c.fees, 720_000_000);
-            assert_eq!(c.gap, gap);
+    }
+    #[test]
+    fn family_size_does_not_multiply_shared_service_charges() {
+        for size in ["1", "2", "4", "8"] {
+            let r = result(&[(5, size)]);
+            assert_eq!(r.household_other.usd(), "$1,166.67");
+            assert_eq!(r.household_annual.other.usd(), "$14,000.00");
         }
+        assert_eq!(result(&[(5, "4")]).household_per_resident.usd(), "$291.67");
     }
     #[test]
-    fn own_support_counted_once_and_reduces_enrolled_household_rate() {
-        let r = result(&[(5, "4"), (6, "2"), (7, "50")]);
-        assert_eq!(r.support, 60000);
-        assert_eq!(r.remaining, 999_940_000);
-        assert_eq!(r.household_total.usd(), "$2,216.62");
-        assert_eq!(r.household_annual.support, 60_000);
-        assert_eq!(r.household_annual.school.usd(), "$9,999.40");
-        assert_eq!(r.household_annual.total.usd(), "$26,599.40");
-    }
-    #[test]
-    fn annual_household_share_updates_with_children_without_changing_community_budget() {
-        for (children, school, total, average) in [
-            ("0", "$0.00", "$16,000.00", "$333.33"),
-            ("1", "$5,000.00", "$21,000.00", "$437.50"),
-            ("2", "$10,000.00", "$26,000.00", "$541.67"),
+    fn enrollment_updates_family_shares_at_full_precision() {
+        for (children, monthly, school, annual, average) in [
+            ("0", "$1,166.67", "$0.00", "$14,000.00", "$291.67"),
+            ("1", "$1,583.33", "$5,000.00", "$19,000.00", "$395.83"),
+            ("2", "$2,000.00", "$10,000.00", "$24,000.00", "$500.00"),
         ] {
             let r = result(&[(5, "4"), (6, children)]);
-            assert_eq!(r.household_annual.other.usd(), "$16,000.00");
+            assert_eq!(r.household_total.usd(), monthly);
             assert_eq!(r.household_annual.school.usd(), school);
-            assert_eq!(r.household_annual.total.usd(), total);
+            assert_eq!(r.household_annual.total.usd(), annual);
             assert_eq!(r.household_per_resident.usd(), average);
-            assert_eq!(r.input.b, 5_000_000_000);
-            assert_eq!(r.remaining, 1_000_000_000);
-            assert_eq!(r.input.e, 2_000);
+            assert_eq!(r.input.e, 2000);
+            assert_eq!(r.input.b, 15_000_000_000);
         }
     }
     #[test]
-    fn annual_values_follow_support_and_enrollment_at_full_precision() {
-        let r = result(&[(5, "4"), (6, "2"), (4, "2000000")]);
-        assert_eq!(r.household_annual.school.usd(), "$8,000.00");
-        assert_eq!(r.household_annual.total.usd(), "$24,000.00");
-        let r = result(&[(5, "4"), (6, "2"), (3, "1000")]);
-        assert_eq!(r.household_annual.school.usd(), "$20,000.00");
-        assert_eq!(r.household_annual.total.usd(), "$36,000.00");
-        let r = result(&[(3, "0"), (7, "50")]);
-        assert_eq!(r.household_annual.school.usd(), "$0.00");
-        assert_eq!(r.household_annual.total.usd(), "$8,600.00");
-        let r = result(&[(5, "4"), (6, "2"), (4, "11000000")]);
-        assert_eq!(r.household_annual.school.usd(), "$0.00");
-        assert_eq!(r.household_annual.total.usd(), "$16,000.00");
+    fn family_count_changes_the_shared_requirement() {
+        let r = result(&[(2, "20000")]);
+        assert_eq!(r.average.usd(), "$625.00");
+        assert_eq!(r.household_other.usd(), "$583.33");
+        assert_eq!(r.household_annual.total.usd(), "$7,000.00");
     }
     #[test]
-    fn zero_enrollment_preserves_need_and_unavailable_rate() {
+    fn school_support_and_optional_gifts_are_counted_once() {
+        let r = result(&[(5, "4"), (6, "2"), (4, "2000000")]);
+        assert_eq!(r.household_total.usd(), "$1,833.33");
+        assert_eq!(r.household_annual.total.usd(), "$22,000.00");
+        let r = result(&[(5, "4"), (6, "2"), (7, "50")]);
+        assert_eq!(r.support, 60_000);
+        assert_eq!(r.household_total.usd(), "$2,049.95");
+        assert_eq!(r.household_annual.school.usd(), "$9,999.40");
+        assert_eq!(r.household_annual.total.usd(), "$24,599.40");
+        assert_eq!(result(&[(7, "50")]).household_total.usd(), "$1,216.67");
+    }
+    #[test]
+    fn fewer_students_and_zero_enrollment() {
+        let r = result(&[(3, "1000"), (5, "4"), (6, "2")]);
+        assert_eq!(r.school_rate.unwrap().usd(), "$833.33");
+        assert_eq!(r.household_annual.total.usd(), "$34,000.00");
         let r = result(&[(3, "0")]);
         assert_eq!(r.school_rate, None);
         assert_eq!(r.remaining, 1_000_000_000);
-        assert_eq!(r.household_total.usd(), "$666.67");
+        assert_eq!(r.household_annual.total.usd(), "$14,000.00");
         let r = result(&[(3, "0"), (4, "10000000")]);
         assert_eq!(r.school_rate, None);
         assert_eq!(r.remaining, 0);
     }
     #[test]
-    fn surplus_is_not_assigned_to_other_services() {
-        let r = result(&[(4, "11000000")]);
+    fn surplus_does_not_discount_other_services() {
+        let r = result(&[(4, "11000000"), (5, "4"), (6, "2")]);
         assert_eq!(r.surplus, 100_000_000);
-        assert_eq!(r.applied, 1_000_000_000);
         assert_eq!(r.school_rate.unwrap().usd(), "$0.00");
-        assert_eq!(r.other_rate.usd(), "$333.33");
-        let c = evaluate(&raw(&[(4, "11000000"), (8, "300")]))
-            .comparison
-            .unwrap()
-            .unwrap();
-        assert_eq!(c.surplus, 820_000_000);
-        assert_eq!(c.gap, 0);
+        assert_eq!(r.household_total.usd(), "$1,166.67");
     }
     #[test]
     fn zero_budgets_and_all_school_budget() {
         assert_eq!(result(&[(0, "0"), (1, "0")]).household_total.usd(), "$0.00");
-        assert_eq!(result(&[(1, "0")]).other_rate.usd(), "$416.67");
+        assert_eq!(result(&[(1, "0")]).other_rate.usd(), "$1,250.00");
         assert_eq!(result(&[(0, "10000000")]).other_rate.usd(), "$0.00");
     }
     #[test]
-    fn exact_parsing_and_half_up_rounding() {
-        assert_eq!(parse_money("0.01"), Ok(1));
-        assert_eq!(parse_money("50.5"), Ok(5050));
-        for text in [
-            "", "NaN", "Infinity", "-1", "1e3", "1,000", "$50", "1.001", "1.", ".5", "1.0.0", "+5",
-        ] {
-            assert!(parse_money(text).is_err(), "{text}");
+    fn comparison_price_is_separate_and_reveals_gaps() {
+        for (support, gap) in [("0", 280_000_000), ("2000000", 80_000_000)] {
+            let c = evaluate(&raw(&[(4, support), (5, "4"), (6, "2"), (8, "300")]))
+                .comparison
+                .unwrap()
+                .unwrap();
+            assert_eq!(c.fees, 720_000_000);
+            assert_eq!(c.gap, gap);
+            assert_eq!(c.household_total.usd(), "$1,766.67");
         }
-        for text in ["", "1.0", "-1", "1e3", "1,000"] {
-            assert!(parse_count(text).is_err());
-        }
-        assert_eq!(Ratio::new(1, 2).usd(), "$0.01");
-        assert_eq!(Ratio::new(1, 3).usd(), "$0.00");
-        let r = result(&[(5, "4"), (6, "2")]);
-        assert_eq!(r.household_other.usd(), "$1,333.33");
-        assert_eq!(r.household_school.usd(), "$833.33");
-        assert_eq!(r.household_total.usd(), "$2,166.67");
-    }
-    #[test]
-    fn bounds_and_cross_field_validation() {
-        for edits in [
-            vec![(2, "0")],
-            vec![(1, "50000001")],
-            vec![(3, "10001")],
-            vec![(5, "0")],
-            vec![(5, "10001")],
-            vec![(6, "3")],
-            vec![(3, "0"), (6, "1")],
-            vec![(5, "10000")],
-            vec![(2, "1000000001")],
-            vec![(0, "1000000000000.01")],
-            vec![(4, "99999999999999999999999999999999999999999999")],
-        ] {
-            assert!(evaluate(&raw(&edits)).result.is_err(), "{edits:?}");
-        }
-        assert!(evaluate(&raw(&[(5, "10000"), (6, "2000")])).result.is_ok());
-    }
-    #[test]
-    fn blank_comparison_is_distinct_from_zero_and_does_not_poison_primary() {
         assert_eq!(evaluate(&defaults()).comparison, Ok(None));
-        let ev = evaluate(&raw(&[(8, "0")]));
-        assert_eq!(ev.comparison.unwrap().unwrap().gap, 1_000_000_000);
+        assert_eq!(
+            evaluate(&raw(&[(8, "0")])).comparison.unwrap().unwrap().gap,
+            1_000_000_000
+        );
         let ev = evaluate(&raw(&[(8, "bad")]));
         assert!(ev.result.is_ok());
         assert!(ev.comparison.is_err());
     }
     #[test]
-    fn maximum_supported_values_do_not_overflow() {
-        let a = raw(&[
+    fn strict_parsing_and_half_up_rounding() {
+        assert_eq!(parse_money("0.01"), Ok(1));
+        assert_eq!(parse_money("50.5"), Ok(5050));
+        for v in [
+            "", "NaN", "Infinity", "-1", "1e3", "1,000", "$50", "1.001", "1.", ".5", "1.0.0", "+5",
+        ] {
+            assert!(parse_money(v).is_err(), "{v}");
+        }
+        for v in ["", "1.0", "-1", "1e3", "1,000"] {
+            assert!(parse_count(v).is_err());
+        }
+        assert_eq!(Ratio::new(1, 2).usd(), "$0.01");
+        assert_eq!(Ratio::new(1, 3).usd(), "$0.00");
+    }
+    #[test]
+    fn family_validation_does_not_confuse_people_with_households() {
+        for edits in [
+            vec![(2, "0")],
+            vec![(1, "150000001")],
+            vec![(5, "0")],
+            vec![(6, "3")],
+            vec![(3, "0"), (6, "1")],
+            vec![(2, "1")],
+            vec![(2, "1000000001")],
+            vec![(0, "1000000000000.01")],
+        ] {
+            assert!(evaluate(&raw(&edits)).result.is_err(), "{edits:?}");
+        }
+        // Multiple students per family are valid; the total resident population is unspecified.
+        assert!(
+            evaluate(&raw(&[(2, "2"), (3, "5"), (5, "4"), (6, "2")]))
+                .result
+                .is_ok()
+        );
+        assert!(
+            evaluate(&raw(&[(2, "1"), (3, "2"), (5, "4"), (6, "2")]))
+                .result
+                .is_ok()
+        );
+    }
+    #[test]
+    fn supported_limits_do_not_overflow() {
+        let ev = evaluate(&raw(&[
             (0, "1000000000000"),
             (1, "1000000000000"),
             (2, "1000000000"),
@@ -487,30 +489,29 @@ mod tests {
             (6, "1000000000"),
             (7, "1000000000000"),
             (8, "1000000000000"),
-        ]);
-        let ev = evaluate(&a);
+        ]));
         assert!(ev.result.is_ok());
         assert!(ev.comparison.unwrap().is_some());
     }
     #[test]
-    fn exact_reconciliation_across_valid_scenarios() {
-        for n in 1..=20 {
-            for e in 0..=n {
+    fn exact_reconciliation_over_family_scenarios() {
+        for families in 1..=20 {
+            for e in 0..=families * 3 {
                 for d in [0, 100, 10_000, 11_000] {
                     let i = Inputs {
-                        b: 50_000,
+                        b: 150_000,
                         s: 10_000,
-                        n,
+                        families,
                         e,
                         d,
-                        h: n,
-                        k: e,
+                        h: e.max(4),
+                        k: if families == 1 { e } else { e.min(2) },
                         g: 7,
                     };
                     let r = calculate(i).unwrap();
                     let charged = r
                         .other_rate
-                        .times(n * 12)
+                        .times(families * 12)
                         .unwrap()
                         .plus(Ratio::new(r.applied, 1))
                         .unwrap();
@@ -521,12 +522,8 @@ mod tests {
                     assert_eq!(charged.plus(school).unwrap(), Ratio::new(i.b, 1));
                     assert_eq!(r.applied + r.surplus, r.support);
                     assert_eq!(
-                        r.household_total,
-                        r.household_other
-                            .plus(r.household_school)
-                            .unwrap()
-                            .plus(Ratio::new(i.g, 1))
-                            .unwrap()
+                        r.household_annual.total,
+                        r.household_total.times(12).unwrap()
                     );
                 }
             }

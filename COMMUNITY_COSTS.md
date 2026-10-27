@@ -1,59 +1,59 @@
-# Community costs and choice — model notes
+# Community costs and choice - current model
 
-This feature implements the supplied `Saber_Tech_Community_Costs_Codex_Plan.txt`, with the founder's subsequent clarification that the proposed $50 million annual operating total includes housing, healthcare, utilities, school, community centers, parks, and other community operations for 10,000 residents. These are hypothetical planning inputs, not independently verified costs, current prices, service availability, or commitments.
+The founder revised the planning budget to **$150 million per year for upkeep shared across 10,000 families**, adding a recycling plant, waste management, and a food-waste compost/mulch facility. This supersedes the earlier resident-based handoff. Housing, healthcare, utilities, school, community centers, parks, and other operations remain included. Figures are hypothetical planning inputs, not verified costs or current service prices.
 
 ## Budget boundary
 
-| Original annual allocation | Amount | Treatment |
+| Annual allocation | Amount | Treatment |
 | --- | ---: | --- |
-| School | $10,000,000 | Full school allocation, including school overhead and shared-cost allocation |
-| Hospital | $11,000,000 | Inside non-school operations; no healthcare opt-out price is inferred |
-| Remaining community operations | $29,000,000 | Unitemized; includes housing, utilities, community centers, parks, and other operations |
-| Total | $50,000,000 | Each expense appears once |
+| School | $10,000,000 | Retained illustrative allocation, including school overhead |
+| Hospital | $11,000,000 | Retained illustrative allocation, within non-school upkeep |
+| Remaining operations | $129,000,000 | Includes new recovery facilities, housing, utilities, parks, and other operations; individual budgets remain unitemized |
+| Total | $150,000,000 | Each expense counted once |
 
-This annual operating scenario does not establish construction financing or an individual healthcare package. Actual service scopes, itemized budgets, supporting evidence, and participation terms are future work. The overview remains the original founder scenario; editable calculator assumptions are separate and do not invent allocations within the remainder.
+The equal-share comparison is $15,000 per family annually, or $1,250 monthly, before the existing school-choice allocation. Non-school upkeep is $140 million, shared once by each family: $14,000 annually, or $1,166.67 monthly. The school contribution depends on enrollment and assumed support. Recycling revenue, facility prices, and savings are not invented or deducted. This is annual upkeep, not construction financing or an established individual healthcare package.
 
 ## Allocation contract
 
-All money inputs are USD. Defaults are total budget B=$50m, school S=$10m, resident count N=10,000, enrolled resident students E=2,000, annual support from other sources D=0, household residents H=2, household enrolled students K=0, optional household monthly support G=0, and an absent alternative school price F.
+Defaults: total budget B=$150m, school S=$10m, participating families N=10,000, enrolled students E=2,000 (illustrative), annual school support from others D=0, members of the displayed family H=2, its enrolled children K=0, optional monthly school support G=0, and absent comparison price F. All money is USD.
 
-- Other operating cost = B − S. Its monthly per-resident requirement = (B − S) / (12 × N).
-- Annual school support = D + 12 × G. D explicitly excludes the displayed household's support.
-- Support applied = min(S, support). Excess remains an unallocated surplus; it never lowers other-service charges.
-- Remaining school requirement = max(0, S − support). With enrollment E > 0, divide this by 12 × E for the required monthly student rate. With E = 0, the rate is unavailable and the remaining need stays visible.
-- Household total = H × other rate + K × school rate + G; the school term is zero when K = 0.
-- The household's displayed monthly per-resident average is its exact household total divided by H. Its annual breakdown multiplies each exact monthly component by 12 before rounding. Household enrollment updates these household figures; it does not change the independent communitywide enrollment assumption or operating budget.
-- The optional comparison uses entered price F: annual student charges = 12 × E × F. Add assumed support to show the gap or surplus against S. Its separate household total uses K × F. It never replaces the primary required rate.
-- Annual other-service requirements + school participant requirements + applied support reconcile to B. At zero enrollment, the unfilled school requirement replaces participant charges. Surplus is additional and separate.
+- One displayed household is one family. Member count H does **not** multiply its shared-services charge.
+- Other upkeep = B - S. Monthly per-family requirement = (B - S) / (12 * N).
+- Annual school support = D + 12 * G. D excludes this family's support. Applied support = min(S, support); excess remains separately unallocated.
+- Remaining school requirement = max(0, S - support). Required monthly student rate = remaining / (12 * E) when E > 0. With E = 0, show an unavailable rate and the remaining need.
+- Family total = one other-upkeep share + K * school rate + G. No enrolled children means no required school charge in this example; final eligibility remains open.
+- The per-person comparison divides the exact family total by H. It is a display comparison, not a charging rule. Annual figures multiply exact monthly components by 12 before rounding.
+- Optional price F produces annual school contributions of 12 * E * F. Add assumed support to show the gap or surplus against S. Its separate family total uses one other-upkeep share + K * F + G, without replacing the primary required rate.
+- Annual contributions across N families + school participant requirements + applied support reconcile to B. At zero enrollment, the remaining unfunded school requirement replaces participant charges. Surplus is additional and separate.
 
-The model treats support as a funding allocation, not an expense reduction. Resident-funded support and outside support have different effects on collective resident spending; their source split is not calculated here. General school support benefits all enrolled students, rather than being targeted to a chosen household. No school enrollment in a household gives zero required school participation in the calculator, while the wider eligibility policy remains undecided.
+School and hospital inputs stay at their earlier illustrative values until revised. Total population is not inferred from family count, the displayed family size, or student count. Community enrollment stays independent of household edits. General school support benefits all enrolled students; targeted assistance needs separate policy.
 
-## Numerical behavior
+## Validation and precision
 
-Inputs are parsed into integer cents with at most two decimal places; no floating-point money arithmetic or locale-dependent currency parsing is used. Counts are whole numbers. Each money field is limited to $1 trillion and each count to 1 billion; checked integer operations protect intermediate arithmetic. Exact rational rates are retained through household totals; only final display rounds half-up to cents.
+Decimal-to-cents parsing accepts nonnegative money with at most two decimal places. Counts must be whole numbers. Money fields are limited to $1 trillion and counts to 1 billion, with checked integer intermediates and rational rates. Only final display rounds half-up to cents.
 
-Require N > 0; 0 ≤ S ≤ B; 0 ≤ E ≤ N; 1 ≤ H ≤ N; 0 ≤ K ≤ H and K ≤ E; E − K ≤ N − H. These rules prevent counting more students outside the household than residents outside it. Negative, empty required, malformed, excessive-precision, and out-of-range values remain in their fields with explanations. Invalid base inputs remove the primary estimate. An invalid comparison price only disables the comparison. A blank comparison is inactive and differs from explicitly testing $0.
+Require N > 0, H >= 1, 0 <= S <= B, K <= H, and K <= E. Students can outnumber families; H is not capped by N. With N = 1, require E = K because no other participating family could contain remaining students. No resident-population constraint is invented when population is unspecified.
 
-Displayed rounded lines can differ from their total by a cent. For four residents and two students, household other services are displayed as $1,333.33 and school as $833.33; the exact total rounds to $2,166.67. The annual total is $26,000.00, computed before monthly display rounding. With a $50 monthly household gift, its $600 annual support reduces the shared school rate and the household total becomes $2,216.62 monthly or $26,599.40 annually.
+Invalid input remains visible with a nearby error and no stale estimate. An invalid optional comparison leaves the primary result usable. Blank comparison differs from a zero-dollar test. Late field-change announcements during route changes ignore disposed calculator state.
 
-## Interface and evidence
+## Reference examples
 
-`#/costs` has three focused views: How it works, Household calculator, and Funding & accountability. Each has an intentional desktop scroll region; mobile stacks content in reading order. Native details controls expose community assumptions, reconciliation, and the alternative-price comparison. Labels link help and errors to fields. Results update without moving focus; a polite summary is announced when an edit is committed rather than on every keystroke. Reset restores all input defaults and clears errors. Screen-reader audio output has not been independently audited.
+At 10,000 families and 2,000 students:
 
-The results show an expanded household annual breakdown with enrolled-child count, other services, required school contribution, optional support, and total. The whole-community reconciliation and its pre-allocation average sit in a separately labeled expandable section. The visitor's expanded/collapsed choices persist through edits and invalid-input recovery, so the breakdown can be watched while changing enrollment.
+| Family scenario | Monthly total | Annual total |
+| --- | ---: | ---: |
+| Any valid member count, no enrolled children, no support | $1,166.67 | $14,000.00 |
+| Four members, one enrolled child, no support | $1,583.33 | $19,000.00 |
+| Four members, two enrolled children, no support | $2,000.00 | $24,000.00 |
+| Four members, two enrolled children, $2m school support from others | $1,833.33 | $22,000.00 |
+| Four members, two enrolled children, own $50 monthly school support | $2,049.95 | $24,599.40 |
 
-The feature creates no bill, enrollment, coverage, pledge, investment, voting action, or payment. Values exist only in component memory, and are not transmitted, persisted, or placed in a shared URL. Development donations and investment-interest inquiries are separate from hypothetical school support. Optional support creates no extra community voting rights.
+The $300 school-price comparison still leaves a $2.8m annual gap without support, or $800,000 with $2m support. Annual totals never multiply already-rounded monthly display amounts.
 
-The two companion JSON files named in the handoff were not available. Tests were authored from the written calculation contract and reference examples; they are not represented as execution of supplied JSON fixtures. See `VERIFICATION.md` for actual checks.
+## Interface, evidence, and remaining decisions
 
-## Open operating decisions
+`#/costs` retains three views: How it works, Household calculator, and Funding & accountability, and links to `#/recovery`. Expanded household/community breakdowns persist through edits and invalid-input recovery. Reset restores input defaults. Values exist only in component memory. No enrollment, payment, pledge, coverage, vote, investment, browser storage, or URL-encoded household data is created. Donation and interest forms remain separate.
 
-- Evidenced budgets, location, accountable operators, capacity, and service readiness.
-- Individual non-school service choices and infrastructure obligations associated with a home or service.
-- School allocation methods, eligibility, schooling elsewhere, participation periods, and withdrawal rules.
-- Healthcare scope, funding terms, and individual coverage.
-- Minimum viable participation and funding commitments, contribution changes, shortfall procedures, and hardship assistance.
-- Handling surplus support, including any reserve, refund, or spending policy.
-- Community membership, voting procedures, and management review and replacement authority.
+Thirteen tests target this family-based contract, including 2,600 exact reconciliation scenarios. The original handoff's companion JSON fixtures were unavailable. Historical verification records describe earlier assumptions and are not the current price model. See `VERIFICATION.md` for actual checks.
 
-A future service record should identify its stable ID, operator, scope and period, evidenced budget and status, participation unit, count and capacity, required contributions, support sources and restrictions, fixed and variable costs, participation terms, and readiness evidence. This initial two-pool calculator does not fabricate those records for every operating domain.
+Open decisions include evidenced facility budgets and capacity; selected development and accountable operators; independent service choices; infrastructure obligations; school eligibility and schooling elsewhere; healthcare scope; participation periods and withdrawal; minimum funding commitments; hardship and surplus policies; governance membership, voting, and management accountability. A working demo does not establish operating readiness or economic feasibility.

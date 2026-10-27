@@ -44,7 +44,7 @@ fn CostField(
                 aria-invalid=move || (!error().is_empty()).to_string()
                 aria-describedby=format!("cost-help-{index} cost-error-{index}")
                 on:input=move |ev| raw.update(|a| a[index]=event_target_value(&ev))
-                on:change=move |_| announced.set(announcement(&evaluation.get()))/>
+                on:change=move |_| {if let Some(ev)=evaluation.try_get(){let _=announced.try_set(announcement(&ev));}}/>
             <p class="cost-help" id=format!("cost-help-{index}")>{help}</p>
             <p class="cost-error" id=format!("cost-error-{index}") hidden=move || error().is_empty()>{error}</p>
         </div>
@@ -67,19 +67,19 @@ fn CostResults(evaluation: Memo<Evaluation>) -> impl IntoView {
                     <p class="cost-total" data-testid="household-total">{r.household_total.usd()}</p>
                     <h2>"Estimated monthly household contribution in this scenario"</h2>
                     <dl class="cost-lines">
-                        <div><dt>"Your household’s other services"<small>{format!("{} residents · includes housing, healthcare, utilities & shared places",r.input.h)}</small></dt><dd data-testid="household-other">{r.household_other.usd()}</dd></div>
+                        <div><dt>"Your household’s other services"<small>{format!("One family with {} members · one share of housing, healthcare, utilities & shared places",r.input.h)}</small></dt><dd data-testid="household-other">{r.household_other.usd()}</dd></div>
                         <div><dt>"Your household’s school participation"<small>{format!("{} enrolled students",r.input.k)}</small></dt><dd data-testid="household-school">{r.household_school.usd()}</dd></div>
                         <div><dt>"Your household’s optional school support"<small>"Voluntary spending · counted once in the school pool"</small></dt><dd data-testid="household-gift">{money(r.input.g)}</dd></div>
                     </dl>
                     <div class="cost-rate-grid">
-                        <div><span>"Other services per resident / month"</span><b data-testid="other-rate">{r.other_rate.usd()}</b></div>
+                        <div><span>"Other services per family / month"</span><b data-testid="other-rate">{r.other_rate.usd()}</b></div>
                         <div><span>"School contribution needed per enrolled student / month"</span><b data-testid="school-rate">{r.school_rate.map(|v|v.usd()).unwrap_or("Unavailable".into())}</b></div>
                     </div>
-                    <p class="cost-comparison-average"><strong data-testid="household-average">{r.household_per_resident.usd()}</strong>" / resident / month is your household’s average with "<span data-testid="household-enrollment">{format!("{} {} enrolled",r.input.k,if r.input.k==1{"child"}else{"children"})}</span>". It includes your household’s optional support and updates with your entries."</p>
+                    <p class="cost-comparison-average"><strong data-testid="household-average">{r.household_per_resident.usd()}</strong>" / resident / month is your household’s average with "<span data-testid="household-enrollment">{format!("{} {} enrolled",r.input.k,if r.input.k==1{"child"}else{"children"})}</span>". This per-person comparison divides your family total by its members; shared upkeep itself is charged once per family."</p>
                     <details class="cost-details cost-household-annual" prop:open=move ||household_open.get()>
-                        <summary on:click=move |ev|{ev.prevent_default();household_open.update(|open|*open=!*open);}>"Your household’s annual breakdown"<span>"Updates with household size, school participation & support"</span></summary>
+                        <summary on:click=move |ev|{ev.prevent_default();household_open.update(|open|*open=!*open);}>"Your household’s annual breakdown"<span>"One family share, plus school participation & optional support"</span></summary>
                         <dl class="cost-lines compact">
-                            <div><dt>"Your household’s other services / year"<small>{format!("{} household residents",r.input.h)}</small></dt><dd data-testid="annual-household-other">{r.household_annual.other.usd()}</dd></div>
+                            <div><dt>"Your household’s other services / year"<small>{format!("One family · {} members; upkeep is not multiplied by member count",r.input.h)}</small></dt><dd data-testid="annual-household-other">{r.household_annual.other.usd()}</dd></div>
                             <div><dt>"Your household’s school participation / year"<small>{format!("{} enrolled {} in your household",r.input.k,if r.input.k==1{"child"}else{"children"})}</small></dt><dd data-testid="annual-household-school">{r.household_annual.school.usd()}</dd></div>
                             <div><dt>"Your optional school support / year"</dt><dd data-testid="annual-household-support">{money(r.household_annual.support)}</dd></div>
                             <div class="cost-line-total"><dt>"Your household’s annual total"</dt><dd data-testid="annual-household-total">{r.household_annual.total.usd()}</dd></div>
@@ -92,7 +92,7 @@ fn CostResults(evaluation: Memo<Evaluation>) -> impl IntoView {
                     <p class="cost-callout" hidden={r.input.b != 0}>"A zero operating budget is an arithmetic scenario; it does not establish that community services cost nothing."</p>
                     <p class="cost-callout" hidden={r.surplus==0} data-testid="support-surplus">{format!("{} annual school-support surplus is unallocated. It is not transferred to other services; refund, reserve, and spending rules are undecided.",money(r.surplus))}</p>
                     <details class="cost-details cost-community-annual" prop:open=move ||community_open.get()><summary on:click=move |ev|{ev.prevent_default();community_open.update(|open|*open=!*open);}>"Whole community’s annual budget"<span>"Community totals, separate from your household’s share"</span></summary>
-                        <p class="cost-help">{format!("{} residents · {} enrolled students across the community. Household enrollment changes your share of this budget; the community totals change when you edit the community budget or support assumptions.",r.input.n,r.input.e)}</p>
+                        <p class="cost-help">{format!("{} participating families · {} enrolled students across the community. Household enrollment changes your share of this budget; the community totals change when you edit the community budget or support assumptions.",r.input.families,r.input.e)}</p>
                         <dl class="cost-lines compact">
                             <div><dt>"Other-service contribution requirement"</dt><dd>{money(r.other_annual)}</dd></div>
                             <div><dt>{if no_students {"Unfunded school requirement"}else{"Required school contributions"}}</dt><dd>{money(r.remaining)}</dd></div>
@@ -101,7 +101,7 @@ fn CostResults(evaluation: Memo<Evaluation>) -> impl IntoView {
                         </dl>
                         <p class="cost-help">{format!("Assumed school support: {} from everyone else + {} from your household over 12 months = {}. Any surplus is additional to the budget and shown separately.",money(r.input.d),money(r.input.g*12),money(r.support))}</p>
                         <p class="cost-help">"These are modeled requirements and assumptions, not receipts or confirmed commitments. Support shifts who funds the expense; it does not reduce the operating budget."</p>
-                        <p class="cost-help"><strong>{r.average.usd()}</strong>" / resident / month is the whole-budget average before allocating costs by participation. Your household’s own average is shown above."</p>
+                        <p class="cost-help"><strong>{r.average.usd()}</strong>" / family / month is the whole-budget equal-share baseline before allocating costs by participation. Family size does not multiply this baseline. Your household’s own per-person comparison is shown above."</p>
                     </details>
                     <p class="cost-help cost-rounding">"This is an illustration, not a bill or a commitment. Figures are rounded; totals use amounts before rounding, so displayed lines may differ from their total by a cent."</p>
                 }.into_any()
@@ -119,7 +119,7 @@ pub fn CommunityCosts() -> impl IntoView {
     view! {
     <section class="page costs-page">
         <div class="cost-heading"><div><p class="eyebrow"><span/>"SABER TECH / COMMUNITY ECONOMICS"</p><h1>"Understand the cost."<em>"Choose your participation."</em></h1></div><span class="cost-stage">"PROPOSED MODEL"<i class="status-dot"/></span></div>
-        <p class="cost-status"><b>"Planning example."</b>" The $50 million budget illustrates the proposed community. Detailed operating budgets, participation terms, and service availability have not been established."</p>
+        <p class="cost-status"><b>"Planning example."</b>" The $150 million annual upkeep budget is shared across 10,000 families. Detailed operating budgets, participation terms, and service availability have not been established."</p>
         <nav class="cost-tabs" aria-label="Costs and choice views">
             {[(0,"01","How it works"),(1,"02","Household calculator"),(2,"03","Funding & accountability")].into_iter().map(|(i,n,label)|view!{
                 <button type="button" class:active=move ||tab.get()==i aria-pressed=move ||(tab.get()==i).to_string() aria-controls=format!("cost-view-{i}") on:click=move |_|tab.set(i)><span>{n}</span>{label}</button>
@@ -131,22 +131,22 @@ pub fn CommunityCosts() -> impl IntoView {
                     <div class="cost-budget panel">
                         <div class="cost-budget-heading"><span class="technical-label">"ONE INCLUSIVE ANNUAL OPERATING BUDGET"</span><span class="small-badge">"FOUNDER’S PLANNING EXAMPLE"</span></div>
                         <div class="cost-budget-visual">
-                            <div class="cost-donut" role="img" aria-label="Annual budget: school 10 million dollars, hospital 11 million dollars, remaining operations 29 million dollars; total 50 million dollars."><div><small>"ANNUAL OPERATIONS"</small><strong>"$50"<span>"M"</span></strong><p>"10,000 residents"</p></div></div>
+                            <div class="cost-donut" role="img" aria-label="Annual upkeep budget: school 10 million dollars, hospital 11 million dollars, remaining operations including recovery facilities 129 million dollars; total 150 million dollars for 10,000 families."><div><small>"ANNUAL OPERATIONS"</small><strong>"$150"<span>"M"</span></strong><p>"10,000 families"</p></div></div>
                             <div class="cost-budget-legend">
-                                <div><i class="school"/><span><b>"School"</b><small>"20% · complete school allocation"</small></span><strong>"$10M"</strong></div>
-                                <div><i class="hospital"/><span><b>"Hospital"</b><small>"22% · inside non-school operations"</small></span><strong>"$11M"</strong></div>
-                                <div><i class="remaining"/><span><b>"Remaining operations"</b><small>"58% · individual allocations pending"</small></span><strong>"$29M"</strong></div>
-                                <p>"The hospital and remaining operations form the $40M non-school pool. Every expense is counted once."</p>
+                                <div><i class="school"/><span><b>"School"</b><small>"6.67% · complete school allocation"</small></span><strong>"$10M"</strong></div>
+                                <div><i class="hospital"/><span><b>"Hospital"</b><small>"7.33% · inside non-school operations"</small></span><strong>"$11M"</strong></div>
+                                <div><i class="remaining"/><span><b>"Remaining operations"</b><small>"86% · individual allocations pending"</small></span><strong>"$129M"</strong></div>
+                                <p>"The hospital and remaining operations form the $140M non-school pool. Every expense is counted once."</p>
                             </div>
                         </div>
-                        <div class="cost-average-strip"><strong>"$416.67"</strong><span>"Average per resident / month"<small>"$5,000 annually · before allocating costs by participation"</small></span></div>
+                        <div class="cost-average-strip"><strong>"$1,250.00"</strong><span>"Equal-share baseline per family / month"<small>"$15,000 annually · before allocating costs by participation"</small></span></div>
                     </div>
                     <div class="cost-scope panel">
                         <span class="technical-label">"WHAT THE TOTAL IS INTENDED TO OPERATE"</span><h2>"The places we live."<br/>"The services we rely on."</h2>
-                        <div class="cost-inclusions">{[("housing","Housing"),("health","Healthcare"),("energy","Utilities"),("education","School"),("community","Community centers"),("play","Parks & shared places")].into_iter().map(|(icon,label)|view!{<div><Icon name=icon.to_string()/><span>{label}</span></div>}).collect_view()}</div>
-                        <p>"The $50M is the proposed annual cost of running the whole community, including these services and other operations. Housing, utilities, parks, and community centers sit within the unitemized remainder; their individual budgets are not yet established."</p>
-                        <p class="cost-help">"This operating example does not establish construction financing, individual healthcare coverage, or final service terms."</p>
-                        <button class="primary-button" type="button" on:click=move |_|tab.set(1)>"Explore a household example"<Arrow/></button>
+                        <div class="cost-inclusions">{[("housing","Housing"),("health","Healthcare"),("energy","Utilities"),("education","School"),("community","Community centers"),("play","Parks & shared places"),("recovery","Recycling plant"),("recovery","Waste management"),("agriculture","Compost & mulch")].into_iter().map(|(icon,label)|view!{<div><Icon name=icon.to_string()/><span>{label}</span></div>}).collect_view()}</div>
+                        <p>"The $150M is the proposed annual upkeep of the whole community. It includes housing, healthcare, utilities, school, shared places, recycling, waste management, and composting/mulch operations. The $129M remainder is not yet itemized into facility budgets."</p>
+                        <p class="cost-help">"The earlier $10M school and $11M hospital allocations remain illustrative assumptions. No individual budget or savings estimate is invented for the added facilities."</p>
+                        <button class="primary-button" type="button" on:click=move |_|tab.set(1)>"Explore a household example"<Arrow/></button><a class="cost-recovery-link" href="#/recovery">"Explore recycling, waste & material loops"<Arrow/></a>
                     </div>
                 </div>
                 <div class="cost-principles">
@@ -154,15 +154,15 @@ pub fn CommunityCosts() -> impl IntoView {
                     <article><span>"02 / SHARE"</span><h3>"Know what supports your home."</h3><p>"Understand the infrastructure, maintenance, and availability your home and services rely on. Final cost-allocation and participation rules remain open."</p></article>
                     <article><span>"03 / SUPPORT"</span><h3>"Help because you choose to."</h3><p>"People without children would not be required to fund the school. They could choose to support education voluntarily. Optional support starts at zero."</p></article>
                 </div>
-                <p class="cost-overview-note">"The calculator explores school participation first. All 10,000 residents participate in the grouped non-school services in this example; the $333.33 allocation is not an adopted mandatory base fee."</p>
+                <p class="cost-overview-note">"The calculator explores school participation first. The non-school pool is shared equally by 10,000 families. Its $1,166.67 monthly share applies once per family, regardless of family size; school participation and voluntary support are separate."</p>
             </section>
 
             <section id="cost-view-1" hidden=move ||tab.get()!=1 aria-label="Household calculator">
-                <div class="cost-calculator-intro"><div><h2>"Explore a household example."</h2><p>"Housing, healthcare, utilities, school, community centers, and parks are already inside the total. Change the assumptions to see how the same costs are shared."</p></div><button type="button" class="outline-button" on:click=move |_|{raw.set(model::defaults());announced.set("Example reset. Two household residents, no enrolled students, and no optional support. Monthly estimate: $666.67.".into());}>"Reset example"<span aria-hidden="true">"↺"</span></button></div>
+                <div class="cost-calculator-intro"><div><h2>"Explore a household example."</h2><p>"The $150M includes housing, healthcare, utilities, school, shared places, and the new recovery facilities. One family receives one share of non-school upkeep; school use and optional support adjust its total."</p></div><button type="button" class="outline-button" on:click=move |_|{raw.set(model::defaults());announced.set("Example reset. One family with two members, no enrolled students, and no optional support. Monthly estimate: $1,166.67.".into());}>"Reset example"<span aria-hidden="true">"↺"</span></button></div>
                 <div class="cost-calculator-grid">
                     <div class="cost-controls panel">
-                        <fieldset><legend>"Your household"</legend><p class="cost-help">"Everyone in the household counts, including children. USD amounts; no login or personal information needed."</p>
-                            <CostField index=5 label="Residents in your household" help="Includes adults and children. Changing this does not change the community total." raw evaluation announced/>
+                        <fieldset><legend>"Your household"</legend><p class="cost-help">"One household is one participating family. Member count includes children and does not multiply the shared-services charge. All money is USD."</p>
+                            <CostField index=5 label="Members in your family" help="Includes adults and children. Used to validate school participation and show a per-person comparison; the shared-services charge stays one family share." raw evaluation announced/>
                             <CostField index=6 label="Children enrolled in this school" help="Updates your monthly and annual school share. These children are already included in your household residents; community enrollment is a separate assumption." raw evaluation announced/>
                             <CostField index=7 label="Your optional monthly school support (USD)" help="Starts at $0. Counted once in the school pool and once in your spending; this records no gift or pledge." raw evaluation announced/>
                         </fieldset>
@@ -171,8 +171,8 @@ pub fn CommunityCosts() -> impl IntoView {
                             <div class="cost-community-fields">
                                 <CostField index=0 label="Total annual operating budget (USD)" help="Includes the school and all other modeled operations. Maximum $1 trillion per money field." raw evaluation announced/>
                                 <CostField index=1 label="Annual school budget included in total (USD)" help="Complete school allocation, including its share of common costs. No added school surcharge." raw evaluation announced/>
-                                <CostField index=2 label="Residents in the community" help="Children included. All participate in other services here. Maximum 1 billion per count field." raw evaluation announced/>
-                                <CostField index=3 label="Students enrolled in the school" help="2,000 is illustrative, not confirmed enrollment. All students are residents in this example." raw evaluation announced/>
+                                <CostField index=2 label="Participating families in the community" help="Default: 10,000 families, not 10,000 people. Each family shares non-school upkeep once. Total resident population is not specified." raw evaluation announced/>
+                                <CostField index=3 label="Students enrolled in the school" help="2,000 remains an editable illustration, not confirmed enrollment. Students may outnumber families; more than one child can belong to a family." raw evaluation announced/>
                                 <CostField index=4 label="Annual school support from everyone else (USD)" help="Excludes your household’s optional support. No actual support or commitments are asserted." raw evaluation announced/>
                             </div>
                         </details>

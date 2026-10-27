@@ -24,7 +24,7 @@
 .cost-budget-heading .small-badge { font-size:8px; white-space:nowrap; }
 .cost-budget .technical-label,.cost-scope .technical-label { font-size:10px; color:#88c3e0; }
 .cost-budget-visual { display:flex; align-items:center; gap:30px; padding:22px 0; }
-.cost-donut { width:220px; height:220px; border-radius:50%; position:relative; flex-shrink:0; display:grid; place-items:center; background:conic-gradient(from -90deg,#91edff 0% 19.6%,#071421 19.6% 20%,#2e9fff 20% 41.6%,#071421 41.6% 42%,#245476 42% 99.6%,#071421 99.6%); box-shadow:0 0 65px #117bb31c; }
+.cost-donut { width:220px; height:220px; border-radius:50%; position:relative; flex-shrink:0; display:grid; place-items:center; background:conic-gradient(from -90deg,#91edff 0% 6.27%,#071421 6.27% 6.67%,#2e9fff 6.67% 13.6%,#071421 13.6% 14%,#245476 14% 99.6%,#071421 99.6%); box-shadow:0 0 65px #117bb31c; }
 .cost-donut:before { content:''; position:absolute; inset:16px; border-radius:50%; background:radial-gradient(circle,#0c2c41,#061321 72%); border:1px solid #4685a455; box-shadow:inset 0 0 35px #189be518; }
 .cost-donut:after { content:''; position:absolute; inset:26px; border:1px dashed #3b739455; border-radius:50%; }
 .cost-donut>div { position:relative; z-index:1; text-align:center; }
@@ -224,3 +224,5 @@
   .cost-funding-steps,.cost-account-grid { grid-template-columns:1fr; }
   .cost-next a { width:100%; font-size:10px; gap:15px; }
 }
+
+.cost-recovery-link{display:flex;align-items:center;gap:16px;color:#9bddff;font-size:12px;line-height:1.6;margin-top:15px}.cost-recovery-link .arrow{width:18px}.cost-donut strong{font-size:54px}@media(max-width:1250px) and (min-width:961px){.cost-donut strong{font-size:44px}}
