@@ -3,3 +3,4 @@
 /qa/
 *.zip
 .env*
+__pycache__/

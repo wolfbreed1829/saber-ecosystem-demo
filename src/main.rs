@@ -1,5 +1,9 @@
+mod atlas;
+mod community;
+mod community_data;
 mod data;
 mod pages;
+mod readiness;
 mod ui;
 use leptos::prelude::*;
 use ui::*;
@@ -37,7 +41,11 @@ fn App() -> impl IntoView {
     listener.forget();
     Effect::new(move |_| {
         let r = route.get();
-        let title = if let Some(id) = r.strip_prefix("domain/") {
+        let title = if let Some(id) = r.strip_prefix("place/") {
+            community_data::place(id)
+                .map(|p| p.name.clone())
+                .unwrap_or("Everyday places".into())
+        } else if let Some(id) = r.strip_prefix("domain/") {
             data::domain(id).name.clone()
         } else {
             match r.as_str() {
@@ -47,6 +55,12 @@ fn App() -> impl IntoView {
                 "architecture" => "Connected architecture",
                 "governance" => "Authority & rights",
                 "roadmap" => "Path to independence",
+                "community" => "The family neighborhood",
+                "learning" => "Nexus learning campus",
+                "play" => "Play & discovery park",
+                "day" => "A household journey",
+                "places" => "Everyday places",
+                "connections" => "What supports family life",
                 _ => "The Big One",
             }
             .to_string()
@@ -61,13 +75,15 @@ fn App() -> impl IntoView {
                 {move || {
                     let r=route.get();
                     match r.as_str() {
-                        "" => pages::Landing().into_any(), "atlas" => pages::Atlas().into_any(), "systems" => pages::Systems().into_any(), "flows" => pages::Flows().into_any(), "architecture" => pages::Architecture().into_any(), "governance" => pages::Governance().into_any(), "roadmap" => pages::Roadmap().into_any(),
+                        "" => pages::Landing().into_any(), "atlas" => atlas::Atlas().into_any(), "systems" => pages::Systems().into_any(), "flows" => pages::Flows().into_any(), "architecture" => pages::Architecture().into_any(), "governance" => pages::Governance().into_any(), "roadmap" => pages::Roadmap().into_any(),
+                        "community" => community::Community().into_any(), "learning" => view!{<community::Campus play=false/>}.into_any(), "play" => view!{<community::Campus play=true/>}.into_any(), "day" => community::Day().into_any(), "places" => community::Places().into_any(), "connections" => community::Connections().into_any(),
+                        _ if r.starts_with("place/") => view! { <community::PlacePage id=r[6..].to_string()/> }.into_any(),
                         _ if r.starts_with("domain/") => view! { <pages::DomainPage id=r[7..].to_string()/> }.into_any(),
                         _ => view! { <section class="not-found"><p class="eyebrow">"UNMAPPED COORDINATE"</p><h1>"Return to the ecosystem."</h1><a class="primary-button" href="#/atlas">"Open the atlas"<Arrow/></a></section> }.into_any()
                     }
                 }}
             </main>
-            <footer class="global-footer"><span><i class="status-dot"/>"SABER TECH / THE BIG ONE"</span><span>"TARGET ARCHITECTURE · EXECUTIVE DEMO"</span><span class="footer-right">"DESIGNED AS ONE. ACCOUNTABLE BY DOMAIN."</span></footer>
+            <footer class="global-footer"><span><i class="status-dot"/>"SABER TECH / THE BIG ONE"</span><span>"TARGET ARCHITECTURE · DIGITAL BLUEPRINT"</span><span class="footer-right">"DESIGNED AS ONE. ACCOUNTABLE BY DOMAIN."</span></footer>
         </div>
     }
 }

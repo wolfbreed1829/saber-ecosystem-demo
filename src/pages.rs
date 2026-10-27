@@ -319,10 +319,14 @@ const STAGES: [(&str, &str, &str, &str, &str); 6] = [
 ];
 #[component]
 pub fn Roadmap() -> impl IntoView {
+    let deployment = RwSignal::new(true);
     let active = RwSignal::new(0usize);
     view! {<section class="page roadmap-page"><PageTitle kicker="06 / THE PATH TO INDEPENDENCE" title="Earn every step toward self-reliance." description="A progression of evidence—not a promise that the entire ecosystem can be built on one launch date." index="06"/>
+        <div class="section-switcher"><button class:active=move ||deployment.get() on:click=move |_|deployment.set(true)>"First deployment"</button><button class:active=move ||!deployment.get() on:click=move |_|deployment.set(false)>"Path to independence"</button></div>
+        {move ||if deployment.get(){view!{<crate::readiness::Deployment/>}.into_any()}else{view!{<div class="roadmap-stages">
         <div class="stage-track">{STAGES.iter().enumerate().map(|(i,(n,title,_,_,_))|view!{<button class:active=move ||active.get()==i on:click=move |_|active.set(i)><span>{*n}</span><b>{*title}</b><i/></button>}).collect_view()}</div>
         <div class="roadmap-detail panel">{move ||{let(n,title,sub,body,proof)=STAGES[active.get()];view!{<div class="roadmap-number"><span>"EVIDENCE STAGE"</span><b>{n}</b><small>"PROPOSED FRAMEWORK"</small></div><div class="roadmap-copy"><p class="eyebrow">{sub.to_uppercase()}</p><h2>{title}</h2><p class="lead-paragraph">{body}</p><div class="callout"><span>"EVIDENCE TO ADVANCE"</span><p>{proof}</p></div></div><div class="roadmap-principles"><h3>"WHAT STAYS VISIBLE"</h3><Bullets items=vec!["Remaining external inputs".into(),"Real capacity and quality".into(),"Replacement obligations".into(),"Member continuity and rights".into()]/></div>}}}</div>
+        </div>}.into_any()}}
         <div class="roadmap-bottom"><div><span class="status-dot"/><p>"Current baseline: target architecture. Facilities, budgets, production yields, and independence claims require separate evidence."</p></div><a class="outline-button" href="#/atlas">"Return to the ecosystem"<Arrow/></a></div>
     </section>}
 }
@@ -332,44 +336,11 @@ pub fn Landing() -> impl IntoView {
     view! {
         <section class="landing-scene" aria-label="Saber Tech executive entrance">
             <div class="hero-art"><img src="public/tiger-earth.png" alt="A fierce electric-blue tiger emerging from a luminous planet Earth"/><div class="orbital orbital-one"/><div class="orbital orbital-two"/></div><div class="hero-grid"/>
-            <div class="hero-copy"><p class="eyebrow"><span/>"THE BIG ONE / AN INTEGRATED WORLD"</p><h1>"EVERYTHING."<br/><em>"CONNECTED."</em><br/>"BY DESIGN."</h1><p class="hero-description">"An entire ecosystem. From the places we live to the systems that sustain us. Explore the architecture of a self-reliant Saber Tech world."</p><a class="primary-button enter-button" href="#/atlas"><span>"ENTER THE ECOSYSTEM"</span><Arrow/></a><div class="entrance-hint"><span>"01—06"</span>"AN INTERACTIVE EXECUTIVE BRIEFING"</div></div>
+            <div class="hero-copy"><p class="eyebrow"><span/>"THE BIG ONE / AN INTEGRATED WORLD"</p><h1>"EVERYTHING."<br/><em>"CONNECTED."</em><br/>"BY DESIGN."</h1><p class="hero-description">"An entire ecosystem. From the places we live to the systems that sustain us. Explore the architecture of a self-reliant Saber Tech world."</p><a class="primary-button enter-button" href="#/atlas"><span>"ENTER THE ECOSYSTEM"</span><Arrow/></a><div class="entrance-hint"><span>"01—12"</span>"EXPLORE A COMPLETE WORLD"</div></div>
             <div class="hero-coordinate"><span>"SABER / EARTH SYSTEMS"</span><b>"ONE VISION."<br/>"EVERY ESSENTIAL."</b><i/></div>
-            <div class="hero-metrics"><div><b>"24"</b><span>"OPERATING DOMAINS"</span></div><div><b>"06"</b><span>"LAYERS OF EXPLORATION"</span></div><div><b>"01"</b><span>"CONNECTED ECOSYSTEM"</span></div><p>"From everyday services"<br/>"to the ability to produce"<br/>"what keeps them running."</p></div>
+            <div class="hero-metrics"><div><b>"24"</b><span>"OPERATING DOMAINS"</span></div><div><b>"12"</b><span>"LAYERS OF EXPLORATION"</span></div><div><b>"01"</b><span>"CONNECTED ECOSYSTEM"</span></div><p>"From everyday services"<br/>"to the ability to produce"<br/>"what keeps them running."</p></div>
         </section>
     }
-}
-
-#[component]
-pub fn Atlas() -> impl IntoView {
-    let selected = RwSignal::new("housing");
-    let layer = RwSignal::new("All systems");
-    let tab = RwSignal::new(0usize);
-    let zoom = RwSignal::new(1.0f64);
-    let districts = [
-        ("agriculture", "Food production", 50., 18., "Production"),
-        ("energy", "Energy", 66., 25., "Foundations"),
-        ("water", "Water", 80., 42., "Foundations"),
-        ("grocery", "Grocery & essentials", 35., 32., "Community"),
-        ("digital", "Aether core", 51., 25., "Institutions"),
-        ("health", "Healthcare", 66., 51., "Community"),
-        ("housing", "Housing", 20., 39., "Community"),
-        ("machinery", "Manufacturing", 35., 59., "Production"),
-        ("fuel", "Fuel & logistics", 51., 74., "Foundations"),
-    ];
-    view! {<section class="page atlas-page"><PageTitle kicker="01 / THE PHYSICAL ECOSYSTEM" title="A world that works together." description="Explore the infrastructure. Select a district to see what it provides—and what makes it possible." index="01"/>
-        <div class="atlas-layout"><div class="map-panel panel"><div class="map-toolbar"><span class="technical-label">"SYSTEM ATLAS / ISOMETRIC VIEW"</span><span class="small-badge">"CONCEPT MODEL"</span></div>
-            <div class="map-filters" role="group" aria-label="Atlas layers">{["All systems","Community","Production","Foundations","Institutions"].into_iter().map(|l|view!{<button class:active=move || layer.get()==l on:click=move |_|layer.set(l)>{l}</button>}).collect_view()}</div>
-            <div class="map-viewport"><div class="map-world" style=move ||format!("transform:scale({})",zoom.get())><img class="atlas-art" src="public/atlas.svg" alt="Isometric ecosystem with farms, power, water treatment, grocery distribution, headquarters, healthcare, homes, manufacturing, and fuel"/>
-                {districts.into_iter().map(|(id,label,x,y,group)|view!{<button class="map-marker" class:chosen=move ||selected.get()==id class:muted=move ||layer.get()!="All systems"&&layer.get()!=group style=format!("left:{x}%;top:{y}%") aria-label=format!("Select {label}") aria-pressed=move ||(selected.get()==id).to_string() on:click=move |_|{selected.set(id);tab.set(0);} ><i/><span>{label}<small>{format!("DOMAIN {}",number(id))}</small></span></button>}).collect_view()}
-            </div></div>
-            <div class="map-bottom"><span><i class="status-dot"/>"9 DISTRICTS · 24 CONNECTED DOMAINS"</span><div class="map-controls"><button aria-label="Zoom out" disabled={move ||zoom.get()<=1.0} on:click=move |_|zoom.update(|z|*z=(*z-0.1).max(1.0))>"−"</button><button aria-label="Reset map zoom" on:click=move |_|zoom.set(1.0)>{move ||format!("{}%",(zoom.get()*100.).round() as i32)}</button><button aria-label="Zoom in" disabled={move ||zoom.get()>=1.5} on:click=move |_|zoom.update(|z|*z=(*z+0.1).min(1.5))>"+"</button></div></div>
-        </div><aside class="inspector panel" aria-label="Selected district details">{move ||{let d=domain(selected.get());view!{
-            <div class="inspector-heading"><Icon name=d.id.clone()/><span class="technical-label">{format!("DOMAIN {} / {}",number(&d.id),d.sector.to_uppercase())}</span></div><h2>{d.name.clone()}</h2><p class="inspector-tagline">{d.tagline.clone()}</p>
-            <div class="tabs" role="tablist" aria-label="District detail">{["Purpose","Dependencies","Proof"].into_iter().enumerate().map(|(i,t)|view!{<button role="tab" aria-selected=move ||(tab.get()==i).to_string() class:active=move ||tab.get()==i on:click=move |_|tab.set(i)>{t}</button>}).collect_view()}</div>
-            <div class="inspector-content" role="tabpanel">{move ||match tab.get(){0=>view!{<p>{d.summary.clone()}</p><h3>"WHAT IT PROVIDES"</h3><Bullets items=d.outputs.clone()/>}.into_any(),1=>view!{<p>"Every service has an upstream system. These inputs must be supplied, maintained, and eventually reproduced."</p><Bullets items=d.inputs.clone()/>}.into_any(),_=>view!{<p>{d.proof.clone()}</p><div class="callout"><span>"REPLACEMENT CAPACITY"</span><p>{d.replacement.clone()}</p></div>}.into_any()}}</div>
-            <a class="outline-button" href=format!("#/domain/{}",d.id)>"Explore this domain"<Arrow/></a>
-        }}}</aside></div>
-    </section>}
 }
 
 #[component]
@@ -402,12 +373,13 @@ pub fn DomainPage(id: String) -> impl IntoView {
     let d = domain(&id);
     let tab = RwSignal::new(0usize);
     view! {<section class="page domain-page"><div class="domain-breadcrumb"><a href="#/systems">"← All domains"</a><span>"/"</span><span>{d.sector.clone()}</span><span>"/"</span><b>{number(&d.id)}</b></div><div class="domain-title"><div><p class="eyebrow">{format!("OPERATING BLUEPRINT / {}",d.sector.to_uppercase())}</p><h1>{d.name.clone()}</h1><p>{d.tagline.clone()}</p></div><Icon name=d.id.clone()/></div>
-        <div class="domain-layout"><aside class="domain-visual panel"><div class="technical-label">"PART OF A CONNECTED WORLD"</div><div class="domain-visual-art"><img src="public/atlas.svg" alt="The connected physical ecosystem"/><div class="domain-emblem"><Icon name=d.id.clone()/></div></div><p class="technical-label">"CONNECTED DOMAINS"</p><div class="dependency-links">{d.links.iter().map(|id|{let linked=domain(id);view!{<a href=format!("#/domain/{id}")><span>{linked.name.clone()}</span><span>"↗"</span></a>}}).collect_view()}</div><a class="back-atlas" href="#/atlas">"Return to the physical atlas →"</a></aside>
-        <div class="domain-reading panel"><div class="tabs" role="tablist" aria-label="Domain chapters">{["Overview","How it operates","Supply & replacement","Evidence"].into_iter().enumerate().map(|(i,label)|view!{<button role="tab" aria-selected=move ||(tab.get()==i).to_string() class:active=move ||tab.get()==i on:click=move |_|tab.set(i)>{label}</button>}).collect_view()}</div><div class="chapter" role="tabpanel">{move ||match tab.get(){
+        <div class="domain-layout"><aside class="domain-visual panel"><div class="technical-label">"PART OF A CONNECTED WORLD"</div><div class="domain-visual-art"><img src="public/atlas.svg" alt="The connected physical ecosystem"/><div class="domain-emblem"><Icon name=d.id.clone()/></div></div><p class="technical-label">"CONNECTED DOMAINS"</p><div class="dependency-links">{d.links.iter().map(|id|{let linked=domain(id);view!{<a href=format!("#/domain/{id}")><span>{linked.name.clone()}</span><span>"↗"</span></a>}}).collect_view()}</div><a class="back-atlas" href=if d.id=="education"{"#/learning"}else if d.id=="governance"{"#/place/community-center"}else{"#/community"}>"Explore the family-life connection →"</a><a class="back-atlas" href="#/atlas">"Return to the physical atlas →"</a></aside>
+        <div class="domain-reading panel"><div class="tabs" role="tablist" aria-label="Domain chapters">{["Overview","How it operates","Supply & replacement","Evidence required","Readiness"].into_iter().enumerate().map(|(i,label)|view!{<button role="tab" aria-selected=move ||(tab.get()==i).to_string() class:active=move ||tab.get()==i on:click=move |_|tab.set(i)>{label}</button>}).collect_view()}</div><div class="chapter" role="tabpanel">{move ||match tab.get(){
             0=>view!{<p class="eyebrow">"THE PURPOSE"</p><h2>{d.tagline.clone()}</h2><p class="lead-paragraph">{d.summary.clone()}</p><div class="two-columns"><div><h3>"REQUIRED INPUTS"</h3><Bullets items=d.inputs.clone()/></div><div><h3>"DELIVERED OUTPUTS"</h3><Bullets items=d.outputs.clone()/></div></div>}.into_any(),
             1=>view!{<p class="eyebrow">"THE OPERATING MODEL"</p><h2>"From intent to dependable delivery."</h2><div class="operating-steps">{d.build.iter().enumerate().map(|(i,text)|view!{<div><b>{format!("0{}",i+1)}</b><p>{text.clone()}</p></div>}).collect_view()}</div><div class="callout"><span>"ACCOUNTABILITY"</span><p>"A named operator owns the service promise, staffing, quality, maintenance, and continuity. Shared technology supports that responsibility."</p></div>}.into_any(),
             2=>view!{<p class="eyebrow">"THE INDEPENDENCE QUESTION"</p><h2>"What keeps this system running?"</h2><p class="lead-paragraph">{d.replacement.clone()}</p><div class="two-columns"><div><h3>"TRACE EVERY INPUT"</h3><Bullets items=d.inputs.clone()/></div><div><h3>"FOLLOW THE NEXT CONNECTION"</h3><div class="dependency-links">{d.links.iter().map(|id|view!{<a href=format!("#/domain/{id}")>{domain(id).name.clone()}<span>"↗"</span></a>}).collect_view()}</div></div></div><p class="small-note">"Starting inventory provides a buffer. A qualified internal production pathway closes a recurring dependency."</p>}.into_any(),
-            _=>view!{<p class="eyebrow">"THE EVIDENCE GATE"</p><h2>"Define the claim. Demonstrate it."</h2><p class="lead-paragraph">{d.proof.clone()}</p><div class="evidence-grid">{["Accepted quality","Required capacity","Named responsibility","Measured inputs","Recovery demonstrated","Replacement pathway"].into_iter().enumerate().map(|(i,t)|view!{<div><span>{format!("0{}",i+1)}</span>{t}</div>}).collect_view()}</div><div class="callout"><span>"CURRENT STATUS / PROPOSED"</span><p>"This executive demo describes the target architecture. It does not claim that these facilities, capacities, or independence tests have been completed."</p></div>}.into_any()
+            3=>view!{<p class="eyebrow">"THE EVIDENCE GATE"</p><h2>"Define the claim. Demonstrate it."</h2><p class="lead-paragraph">{d.proof.clone()}</p><div class="evidence-grid">{["Accepted quality","Required capacity","Named responsibility","Measured inputs","Recovery demonstrated","Replacement pathway"].into_iter().enumerate().map(|(i,t)|view!{<div><span>{format!("0{}",i+1)}</span>{t}</div>}).collect_view()}</div><div class="callout"><span>"CURRENT STATUS / PROPOSED"</span><p>"This digital blueprint describes the target architecture. It does not claim that these facilities, capacities, or independence tests have been completed."</p></div>}.into_any(),
+            _=>view!{<p class="eyebrow">"SEPARATE EVIDENCE / SEPARATE CLAIMS"</p><h2>"Readiness by capability."</h2><p class="lead-paragraph">"Each dimension advances on its own evidence. A working demo does not establish an operating service or commissioned infrastructure."</p><crate::readiness::Readiness/>}.into_any()
         }}</div></div></div>
     </section>}
 }

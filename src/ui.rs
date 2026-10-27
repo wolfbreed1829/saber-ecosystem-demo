@@ -14,6 +14,7 @@ pub fn Header(route: RwSignal<String>, reduced: RwSignal<bool>) -> impl IntoView
     let copy_error = RwSignal::new(false);
     let nav = [
         ("atlas", "Atlas"),
+        ("community", "Life here"),
         ("systems", "Domains"),
         ("flows", "Flows"),
         ("architecture", "Architecture"),
@@ -23,7 +24,7 @@ pub fn Header(route: RwSignal<String>, reduced: RwSignal<bool>) -> impl IntoView
     view! {
         <header class="global-header"><Logo/>
             <nav aria-label="Main navigation" class:entrance-nav=move || route.get().is_empty()>{nav.into_iter().enumerate().map(|(i,(path,label))|view! {
-                <a href=format!("#/{path}") class:active=move || route.get()==path || (path=="systems" && route.get().starts_with("domain/")) aria-current=move || if route.get()==path {"page"} else {"false"}><small>{format!("{:02}",i+1)}</small>{label}</a>
+                <a href=format!("#/{path}") class:active=move || route.get()==path || (path=="systems" && route.get().starts_with("domain/")) || (path=="community" && (matches!(route.get().as_str(),"learning"|"play"|"day"|"places"|"connections")||route.get().starts_with("place/"))) aria-current=move || if route.get()==path {"page"} else {"false"}><small>{format!("{:02}",i+1)}</small>{label}</a>
             }).collect_view()}</nav>
             <div class="header-actions"><button class="icon-button motion-button" title="Toggle animation" aria-label="Toggle animation" aria-pressed=move || (!reduced.get()).to_string() on:click=move |_|reduced.update(|v|*v=!*v)><span>{move || if reduced.get(){"Ⅱ"}else{"≈"}}</span></button>
                 <button class="share-button" on:click=move |_| {spawn_local(async move {let url=window().location().href().unwrap_or_default();if JsFuture::from(window().navigator().clipboard().write_text(&url)).await.is_ok() {copied.set(true);copy_error.set(false);} else {copy_error.set(true);}});} ><span>{move || if copied.get(){"Link copied"}else if copy_error.get(){"Copy address bar"}else{"Copy link"}}</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8 5H4v12h12v-4M10 3h7v7M17 3 8 12" stroke="currentColor" stroke-width="1.3"/></svg></button>
@@ -39,10 +40,16 @@ pub fn PageTitle(
     description: &'static str,
     index: &'static str,
 ) -> impl IntoView {
-    view! {<div class="page-title"><div><p class="eyebrow"><span/> {kicker}</p><h1>{title}</h1><p class="page-description">{description}</p></div><span class="page-index">{index}<small>" / 06"</small></span></div>}
+    view! {<div class="page-title"><div><p class="eyebrow"><span/> {kicker}</p><h1>{title}</h1><p class="page-description">{description}</p></div><span class="page-index">{index}<small>" / 12"</small></span></div>}
 }
 pub fn icon_svg(name: &str) -> String {
     let body = match name {
+        "continuity" => {
+            "<path d='m20 3 14 5v12c0 9-14 17-14 17S6 29 6 20V8Z'/><path d='m12 20 6 6 11-13'/>"
+        }
+        "play" => {
+            "<path d='M5 35 13 6h14l8 29M10 16h20M16 16v13h8V16M13 35h14'/><path d='m3 35 34 0'/>"
+        }
         "water" => {
             "<path d='M20 4S8 16 8 23a12 12 0 0 0 24 0C32 16 20 4 20 4Z'/><path d='M13 24a7 7 0 0 0 7 7'/>"
         }
