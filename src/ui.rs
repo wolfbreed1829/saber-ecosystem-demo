@@ -27,6 +27,7 @@ pub fn Header(route: RwSignal<String>, reduced: RwSignal<bool>) -> impl IntoView
     let nav = [
         ("atlas", "Atlas"),
         ("community", "Life here"),
+        ("costs", "Costs & choice"),
         ("systems", "Domains"),
         ("flows", "Flows"),
         ("architecture", "Architecture"),

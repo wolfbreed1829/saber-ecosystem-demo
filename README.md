@@ -14,6 +14,7 @@ A cinematic digital blueprint of the Saber Tech ecosystem and the everyday life 
 - Five physical production chains with individually selectable stages.
 - Six architecture layers, four authority perspectives, and six evidence stages.
 - A proposed first deployment: a complete housing-maintenance request workflow, with users, operator responsibilities, dependencies, and proposed acceptance criteria. It is a planning proposal, not an announced launch.
+- A **Costs & choice** section at `#/costs`: the inclusive $50 million annual operating example for 10,000 residents, a household calculator, and funding/accountability explanations in three separate views. Housing, healthcare, utilities, school, community centers, and parks are within the proposed total. No individual prices are invented for the $29 million remainder.
 - A two-step early investment-interest form at `#/interest`, with contact details, topic selection, optional notes, a review step, and explicit consent. It sends a native HTTPS POST to FormSubmit for delivery to `development@sabertechlogistics.com`.
 - Search, sector filters, pagination, hash-based deep links, copy-link sharing, reduced motion, keyboard-accessible controls, and responsive layouts.
 
@@ -46,7 +47,28 @@ The checked-in `docs/` directory is the verified release bundle used by GitHub P
 
 Run `python generate_atlas.py`, `python generate_community.py`, and `python generate_atlas_extensions.py` to regenerate the original vector illustrations. These are conceptual arrangements, not dimensioned construction or playground equipment designs.
 
-Twelve main routes are directly shareable through hash navigation, plus 24 domain and 20 place routes. Start with `#/community` for family life, `#/learning` for the campus, `#/play` for the park, or `#/day` for a guided household journey.
+Main sections are directly shareable through hash navigation, plus 24 domain and 20 place routes. Start with `#/community` for family life, `#/learning` for the campus, `#/play` for the park, `#/day` for a guided household journey, or `#/costs` for the proposed operating budget and household examples.
+
+## Community costs and choice
+
+The founder's planning example allocates $10 million to school and $11 million to hospital operations within the $50 million total; the remaining $29 million is unitemized. The hospital and remainder form the calculator's $40 million non-school pool. The average is $416.67 per resident per month before allocation by participation, not a universal household price or independently verified operating estimate.
+
+The calculator assumes 2,000 resident students, universal participation in non-school operations, and school allocation per enrolled student. Optional support starts at zero. No enrolled household students means no required school charge in this example; final eligibility and treatment of schooling elsewhere remain open. General support reduces the requirement shared by all enrolled students; targeted hardship support is not modeled.
+
+`src/cost_model.rs` holds the defaults, strict decimal-to-cents parsing, cross-field validation, exact rational calculations, half-up display rounding, and focused tests. `src/community_costs.rs` implements the explanation and UI; `community-costs.css` supplies scoped presentation styles. The overview always presents the founder's original scenario, while calculator edits apply to its own results. See [model notes and unresolved decisions](COMMUNITY_COSTS.md).
+
+Run the pure model tests without a browser or WebAssembly test runner:
+
+```text
+rustc --edition 2024 --test src/cost_model.rs -o target/cost-model-tests.exe
+./target/cost-model-tests.exe
+cargo fmt --check
+trunk build --release --public-url ./
+```
+
+Create `target/` first if it does not yet exist. On non-Windows platforms an executable name without `.exe` may be used. Set `NO_COLOR=true` if needed as described above.
+
+The calculator stores values only in component memory. It sends no requests, writes no browser storage, creates no commitments, and does not include values in copied URLs. Leaving the route or reloading restores defaults. PayPal donations and FormSubmit interest delivery retain their separate existing configuration.
 
 ## Early investment-interest delivery
 
