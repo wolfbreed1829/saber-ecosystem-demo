@@ -1,6 +1,6 @@
 # Recovery campus and material pathways
 
-The founder requested recycling, waste management, and a compost/mulch facility within the revised $150 million annual upkeep plan for 10,000 families. `#/recovery` supplies a physical campus concept, seven selectable material loops, and readiness explanations. It is reachable from the costs overview, the twelfth atlas district marker (Recovery works), and the existing recovery operating domain. The directory remains 24 operating domains.
+The founder requested recycling, waste management, and a compost/mulch facility within the revised $150 million annual upkeep plan. The latest clarification sets the cost divisor to 10,000 residents, giving a full-budget average of $1,250 per person per month; household estimates allocate school separately. `#/recovery` supplies a physical campus concept, seven selectable material loops, and readiness explanations. It is reachable from the costs overview, the twelfth atlas district marker (Recovery works), and the existing recovery operating domain. The directory remains 24 operating domains.
 
 ## Proposed operations
 

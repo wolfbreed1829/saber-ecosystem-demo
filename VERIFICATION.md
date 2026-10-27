@@ -1,5 +1,13 @@
 # Verification
 
+Per-person divisor correction, 2026-10-27 (current model):
+
+- The founder confirmed separate school funding, then clarified the divisor as 10,000 people. The model now uses residents, multiplies non-school upkeep by household members, and validates household/enrollment subsets against that population. The full-budget formula $150,000,000 / 10,000 / 12 = $1,250 per person is displayed above the household calculator and updates with community assumptions.
+- All 13 native model tests pass, including 920 exact annual reconciliation scenarios. Five household members with 0 / 1 / 2 enrolled children produce $5,833.33 / $6,250 / $6,666.67 monthly and $70,000 / $75,000 / $80,000 annually. Shared upkeep is $1,166.67 per person monthly; school remains $416.67 per enrolled student monthly at the illustrative 2,000-student count. Exact rates are used before rounding.
+- Chromium confirms these household totals and their distinct per-person averages. A five-member/two-student household with $2m external school support shows $6,500 monthly; with its own $50 monthly support instead, the annual total is $80,599.40. Changing population to 20,000 updates the full-budget average to $625. Invalid population hides both the estimate and the average; reset restores the two-member $2,333.33 monthly estimate.
+- Breakdown rows now show the actual shared-upkeep and school formulas. Dollar amounts stay on one line, with labels or whole amounts moving to a new row where space requires it. Desktop and mobile screenshots were reviewed. Checks at 1440x900, 1280x640, 768x1024, 360x800, and 1920x1200 with 150% CSS zoom found no horizontal document overflow or split/clipped currency values for the five-person example. CSS zoom was exercised; native browser-toolbar zoom was not independently audited.
+- Calculator edits produced no network requests or application errors. Formatting, whitespace checks, and the production build pass. Recovery budget copy and current model documentation now use residents consistently. The previous release records below retain their historical figures and charging units.
+
 Family-based upkeep and recovery campus, 2026-10-27:
 
 - All 13 native pure-model tests pass, including 2,600 exact annual reconciliation scenarios. The revised default is $150 million across 10,000 families: a $1,250 monthly whole-budget equal-share baseline. The retained $10 million school assumption leaves a $140 million non-school pool, charged once per family regardless of member count.
