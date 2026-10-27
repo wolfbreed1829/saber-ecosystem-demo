@@ -36,7 +36,9 @@ If an inherited `NO_COLOR=1` makes Trunk reject its boolean setting, set `NO_COL
 trunk build --release --public-url ./
 ```
 
-The output is `dist/`. Hash navigation keeps every section directly shareable on GitHub Pages without a server-side router. The application has no database, backend credentials, or payment integration. The interest form sends the visitor's entered details to the explicitly disclosed FormSubmit service only when they submit it. FormSubmit handles delivery and its spam check; GitHub Pages itself cannot send email.
+The output is `dist/`. Hash navigation keeps every section directly shareable on GitHub Pages without a server-side router. The application has no database, backend credentials, or on-site payment processing. The interest form sends the visitor's entered details to the explicitly disclosed FormSubmit service only when they submit it. FormSubmit handles delivery and its spam check; GitHub Pages itself cannot send email.
+
+The entrance's **Support our vision** button uses the supplied PayPal donation form: `POST https://www.paypal.com/donate`, `hosted_button_id=EX59364B55S2A`, and `target=_top`. The configuration lives in `SupportButton` in `src/ui.rs`. PayPal handles the donation flow. The button is labeled as voluntary support with no equity or financial return, distinct from the early investment-interest signup.
 
 The checked-in `docs/` directory is the verified release bundle used by GitHub Pages (main branch, `/docs`). Rebuild and refresh that directory when publishing an update. See [verification](VERIFICATION.md).
 

@@ -1,5 +1,11 @@
 # Verification
 
+PayPal support-button update, 2026-10-27:
+
+- Release build and formatting checks pass. The original supplied action, POST method, hosted button ID `EX59364B55S2A`, and `_top` target are preserved in the custom-styled button.
+- A browser-intercepted click verified the exact payload `hosted_button_id=EX59364B55S2A`. This verification did not initiate a real PayPal payment or inspect the receiving account.
+- Entrance layouts reviewed at 1440×900, 1366×768, 390×844, and 360×800. No horizontal page overflow or overlap between the hero copy and metric strip was found.
+
 Entrance and early-interest update, 2026-10-27:
 
 - Release compilation passes with the signup and entrance components implemented in Leptos. The form has no custom email server or exposed secret.

@@ -5,6 +5,18 @@ pub fn Arrow() -> impl IntoView {
     view! { <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.5"/></svg> }
 }
 #[component]
+pub fn SupportButton() -> impl IntoView {
+    view! {
+        <form class="support-form" action="https://www.paypal.com/donate" method="post" target="_top">
+            <input type="hidden" name="hosted_button_id" value="EX59364B55S2A"/>
+            <button class="support-button" type="submit" aria-describedby="support-purpose">
+                <span><b>"Support our vision"</b><small>"DONATE WITH PAYPAL"</small></span><Arrow/>
+            </button>
+            <p id="support-purpose">"Voluntary donation · no equity or financial return"</p>
+        </form>
+    }
+}
+#[component]
 pub fn Logo() -> impl IntoView {
     view! { <a class="brand" href="#/" aria-label="Saber Tech home"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M7 8h28L20 20h14L11 34l8-13H5l12-8H7Z" fill="currentColor"/></svg><span>"SABER"<b>"TECH"</b><small>"INTEGRATED WORLD SYSTEMS"</small></span></a> }
 }
