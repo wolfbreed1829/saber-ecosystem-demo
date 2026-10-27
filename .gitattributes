@@ -4,3 +4,5 @@
 *.wasm binary
 docs/index.html whitespace=-blank-at-eol
 **/fonts/OFL.txt whitespace=-blank-at-eol
+# Trunk's integrity hashes require byte-identical published assets.
+/docs/** -text whitespace=cr-at-eol,-blank-at-eol
